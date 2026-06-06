@@ -1,0 +1,12 @@
+{
+  "name": "kurva-konik-parametrik",
+  "version": "1.0.0",
+  "description": "Tugas Grafika Komputer - Kurva Konik Parametrik",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kurva Konik Parametrik</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Kurva Konik Parametrik</h1>
+    </header>
+
+    <main>
+      <section class="controls">
+        <label for="curve-type">Pilih Bentuk Geometri:</label>
+        <select id="curve-type">
+          <option value="">-- Pilih Kurva --</option>
+          <option value="circle">Lingkaran</option>
+          <option value="ellipse">Elips</option>
+          <option value="parabola">Parabola</option>
+          <option value="hyperbola">Hiperbola</option>
+        </select>
+
+        <div id="parameter-inputs" class="param-group"></div>
+
+        <button id="process-btn" disabled>Proses Gambar</button>
+      </section>
+
+      <section class="canvas-section">
+        <div class="canvas-wrapper">
+          <canvas id="renderCanvas" width="600" height="500"></canvas>
+        </div>
+
+        <div id="live-coordinates">Koordinat saat ini: X=--, Y=--</div>
+        <div id="render-status">Status: Menunggu input...</div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/geometryCalc.js"></script>
+  <script src="/js/canvasAnimator.js"></script>
+  <script src="/js/ui.js"></script>
+</body>
+</html>
