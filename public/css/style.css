@@ -107,3 +107,42 @@ select, input {
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
 }
+
+.sample-section {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.sample-label {
+  font-size: 0.85rem;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.btn-sample {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: rgba(15, 52, 96, 0.6);
+  color: #eaeaea;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-sample:hover {
+  background: rgba(15, 52, 96, 0.9);
+  transform: translateY(-1px);
+}
+
+.btn-sample-clear {
+  border-color: rgba(233, 69, 96, 0.4);
+  color: #e94560;
+}
+
+.btn-sample-clear:hover {
+  background: rgba(233, 69, 96, 0.15);
+}
