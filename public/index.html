@@ -3,44 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kurva Konik Parametrik</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Kurva Konik Parametrik — Grafika Komputer</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Kurva Konik Parametrik</h1>
-    </header>
 
-    <main>
-      <section class="controls">
-        <label for="curve-type">Pilih Bentuk Geometri:</label>
-        <select id="curve-type">
-          <option value="">-- Pilih Kurva --</option>
-          <option value="circle">Lingkaran</option>
-          <option value="ellipse">Elips</option>
-          <option value="parabola">Parabola</option>
-          <option value="hyperbola">Hiperbola</option>
+  <!-- ══ HEADER ══ -->
+  <header>
+    <div class="header-badge">GRAFIKA KOMPUTER — SEMESTER 4</div>
+    <h1>Pembangkitan Kurva Konik Parametrik</h1>
+    <p>Lingkaran · Elips · Parabola · Hiperbola &nbsp;|&nbsp; Algoritma Representasi Parametrik Step-by-Step</p>
+  </header>
+
+  <!-- ══ DASHBOARD: 2 KOLOM ══ -->
+  <div class="dashboard">
+
+    <!-- ── KIRI: PANEL KONTROL ── -->
+    <div class="panel" id="leftPanel">
+
+      <!-- Pilih Kurva -->
+      <div class="panel-title">Pilih Kurva</div>
+      <div class="field" style="margin-bottom:0">
+        <select id="curveSelect">
+          <option value="circle">⬤&nbsp; Lingkaran</option>
+          <option value="ellipse">⬭&nbsp; Elips</option>
+          <option value="parabola">∪&nbsp; Parabola</option>
+          <option value="hyperbola">⋈&nbsp; Hiperbola</option>
         </select>
+      </div>
 
-        <div id="parameter-inputs" class="param-group"></div>
+      <div class="section-sep"></div>
 
-        <button id="process-btn" disabled>Proses Gambar</button>
-      </section>
+      <!-- Preset -->
+      <div class="panel-title">Preset Cepat</div>
+      <div class="preset-grid" id="presetGrid"></div>
 
-      <section class="canvas-section">
-        <div class="canvas-wrapper">
-          <canvas id="renderCanvas" width="600" height="500"></canvas>
+      <div class="section-sep"></div>
+
+      <!-- Parameter -->
+      <div class="panel-title">Parameter Masukan</div>
+      <div class="param-grid" id="paramContainer"></div>
+
+      <div class="section-sep"></div>
+
+      <!-- Kecepatan animasi -->
+      <div class="panel-title">Kecepatan Animasi</div>
+      <div class="speed-row">
+        <label>Delay/titik</label>
+        <input type="range" id="speedRange" min="0" max="50" value="8">
+        <span class="speed-val" id="speedVal">8 ms</span>
+      </div>
+
+      <!-- Tombol proses -->
+      <button id="processBtn">▶&nbsp; Proses Gambar</button>
+    </div>
+
+    <!-- ── KANAN: CANVAS + INFO ── -->
+    <div class="right-col">
+
+      <!-- Info chips: live koordinat + status -->
+      <div class="info-bar">
+        <div class="info-chip" id="chip-x">
+          <div>
+            <div class="chip-label">KOORDINAT X</div>
+            <div class="chip-val" id="valX">—</div>
+          </div>
         </div>
+        <div class="info-chip" id="chip-y">
+          <div>
+            <div class="chip-label">KOORDINAT Y</div>
+            <div class="chip-val" id="valY">—</div>
+          </div>
+        </div>
+        <div class="info-chip" id="chip-t">
+          <div>
+            <div class="chip-label">PARAMETER t / θ</div>
+            <div class="chip-val" id="valT">—</div>
+          </div>
+        </div>
+        <div class="info-chip" id="chip-status">
+          <div>
+            <div class="chip-label">STATUS</div>
+            <div class="chip-val" id="statusText">Siap — pilih kurva dan klik Proses</div>
+          </div>
+        </div>
+      </div>
 
-        <div id="live-coordinates">Koordinat saat ini: X=--, Y=--</div>
-        <div id="render-status">Status: Menunggu input...</div>
-      </section>
-    </main>
+      <!-- Canvas -->
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="mainCanvas" width="680" height="480"></canvas>
+        <div class="canvas-overlay" id="canvasOverlay">
+          <div class="overlay-icon">◎</div>
+          <div class="overlay-text">Klik "Proses Gambar" untuk memulai rendering</div>
+        </div>
+      </div>
+
+      <!-- Step log (4 langkah algoritma dari PPT) -->
+      <div id="stepLog">
+        <div class="log-line">[ Sistem siap ] — Algoritma representasi parametrik dimuat.</div>
+      </div>
+
+      <!-- Panel analisis -->
+      <div id="analysisPanel">
+        <div class="analysis-title">📐 Analisis Kurva</div>
+        <div class="analysis-formula" id="formulaBox"></div>
+        <div class="props-grid" id="propsGrid"></div>
+      </div>
+
+    </div>
   </div>
 
-  <script src="/js/geometryCalc.js"></script>
-  <script src="/js/canvasAnimator.js"></script>
-  <script src="/js/ui.js"></script>
+  <!-- Load JS: urutan wajib geometryCalc → canvasAnimator → ui -->
+  <script src="js/geometryCalc.js"></script>
+  <script src="js/canvasAnimator.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>
