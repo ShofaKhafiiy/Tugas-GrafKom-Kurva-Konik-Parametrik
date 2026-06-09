@@ -339,8 +339,10 @@ function showAnalysis(curveType, vals) {
 // updateAnalysis — refresh analisis dari nilai form saat ini
 // ------------------------------------------------------------
 function updateAnalysis() {
-  var curveType = document.getElementById('curveSelect').value;
-  var defs      = getParamDefs(curveType);
+  var curveSelect = document.getElementById('curveSelect');
+  var activeCard = curveSelect.querySelector('.curve-card.active');
+  var curveType  = activeCard ? activeCard.getAttribute('data-curve') : 'circle';
+  var defs       = getParamDefs(curveType);
   var vals      = getFormValues(defs);
   if (!isNaN(vals.delta) && vals.delta > 0 && vals.tMin < vals.tMax) {
     showAnalysis(curveType, vals);
@@ -362,8 +364,10 @@ function renderParamsAndPresets(curveType) {
 // processCurve — ambil form → hitung → animasi
 // ------------------------------------------------------------
 function processCurve() {
-  var curveType = document.getElementById('curveSelect').value;
-  var defs      = getParamDefs(curveType);
+  var curveSelect = document.getElementById('curveSelect');
+  var activeCard = curveSelect.querySelector('.curve-card.active');
+  var curveType  = activeCard ? activeCard.getAttribute('data-curve') : 'circle';
+  var defs       = getParamDefs(curveType);
   var vals      = getFormValues(defs);
 
   if (!validate(vals, curveType)) return;
@@ -423,9 +427,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var curveSelect = document.getElementById('curveSelect');
 
-  // Dropdown kurva berubah
-  curveSelect.addEventListener('change', function() {
-    renderParamsAndPresets(this.value);
+  // Klik card kurva
+  curveSelect.addEventListener('click', function(e) {
+    var card = e.target.closest('.curve-card');
+    if (!card) return;
+    var cards = curveSelect.querySelectorAll('.curve-card');
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].classList.remove('active');
+    }
+    card.classList.add('active');
+    renderParamsAndPresets(card.getAttribute('data-curve'));
   });
 
   // Tombol proses
