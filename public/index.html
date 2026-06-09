@@ -8,6 +8,8 @@
 </head>
 <body>
 
+  <div class="wrapper">
+
   <!-- ══ HEADER ══ -->
   <header>
     <div class="header-badge">GRAFIKA KOMPUTER — SEMESTER 4</div>
@@ -24,10 +26,10 @@
       <!-- Pilih Kurva -->
       <div class="panel-title">Pilih Kurva</div>
       <div class="curve-grid" id="curveSelect">
-        <button class="curve-card active" data-curve="circle">&#11093;&nbsp; Lingkaran</button>
-        <button class="curve-card" data-curve="ellipse">&#11053;&nbsp; Elips</button>
-        <button class="curve-card" data-curve="parabola">&#8746;&nbsp; Parabola</button>
-        <button class="curve-card" data-curve="hyperbola">&#8904;&nbsp; Hiperbola</button>
+        <button class="curve-card active" data-curve="circle"><span class="card-icon">&#9679;</span>Lingkaran</button>
+        <button class="curve-card" data-curve="ellipse"><span class="card-icon">&#9711;</span>Elips</button>
+        <button class="curve-card" data-curve="parabola"><span class="card-icon">&#8743;</span>Parabola</button>
+        <button class="curve-card" data-curve="hyperbola"><span class="card-icon">&#10761;</span>Hiperbola</button>
       </div>
 
       <div class="section-sep"></div>
@@ -109,6 +111,8 @@
       </div>
 
     </div>
+  </div>
+
   </div>
 
   <!-- Load JS: urutan wajib geometryCalc → canvasAnimator → ui -->
