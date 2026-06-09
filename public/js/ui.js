@@ -90,6 +90,58 @@ document.addEventListener('DOMContentLoaded', function () {
         // Panggil saat pertama kali web dibuka
         renderParams(curveSelect.value);
     }
+
+    function validate() {
+      var inputs = paramContainer.querySelectorAll('input');
+      for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].value === '' || inputs[i].value === null) {
+          return false;
+        }
+      }
+      var delta = document.getElementById('delta');
+      if (delta && Number(delta.value) <= 0) {
+        return false;
+      }
+      return true;
+    }
+
+    function processCurve() {
+      if (!validate()) {
+        document.getElementById('render-status').textContent = 'Status: Delta harus > 0 dan semua field terisi.';
+        return;
+      }
+
+      var curveType = curveSelect.value;
+      var defs = getParamDefs(curveType);
+      var values = {};
+      for (var i = 0; i < defs.length; i++) {
+        var el = document.getElementById(defs[i].id);
+        values[defs[i].id] = Number(el.value);
+      }
+
+      var points;
+      switch (curveType) {
+        case 'circle':
+          points = calculateCircle(values.xc, values.yc, values.r, values.delta, values.tMin, values.tMax);
+          break;
+        case 'ellipse':
+          points = calculateEllipse(values.xc, values.yc, values.a, values.b, values.delta, values.tMin, values.tMax);
+          break;
+        case 'parabola':
+          points = calculateParabola(values.xc, values.yc, values.a, values.delta, values.tMin, values.tMax);
+          break;
+        case 'hyperbola':
+          points = calculateHyperbola(values.xc, values.yc, values.a, values.b, values.delta, values.tMin, values.tMax);
+          break;
+      }
+
+      if (typeof animateCurve === 'function') {
+        animateCurve(points);
+      }
+      document.getElementById('render-status').textContent = 'Status: Dihitung ' + points.length + ' titik.';
+    }
+
+    if (processBtn) {
+      processBtn.addEventListener('click', processCurve);
+    }
 });
-// US 1.2 — VALIDASI + PROSES GAMBAR
-// US 2.2 — PANEL ANALISIS
