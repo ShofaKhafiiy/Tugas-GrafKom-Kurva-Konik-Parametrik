@@ -7,6 +7,8 @@
 // Depends on: geometryCalc.js, canvasAnimator.js
 // ============================================================
 
+var TWO_PI = 2 * Math.PI;
+
 // ------------------------------------------------------------
 // getParamDefs — definisi field input per kurva
 // ------------------------------------------------------------
@@ -18,7 +20,7 @@ function getParamDefs(curveType) {
       { id: 'r',     label: 'Radius  (r)',     val: 100,  type: 'number', step: 1 },
       { id: 'delta', label: 'Delta  (Δθ)',     val: 0.05, type: 'number', step: 0.01 },
       { id: 'tMin',  label: 'θ min',           val: 0,    type: 'number', step: 0.1 },
-      { id: 'tMax',  label: 'θ max',           val: 6.28, type: 'number', step: 0.1 }
+      { id: 'tMax',  label: 'θ max',           val: TWO_PI, type: 'number', step: 0.1 }
     ];
   }
 
@@ -30,7 +32,7 @@ function getParamDefs(curveType) {
       { id: 'b',     label: 'Semi-b  (vertikal)',  val: 80,  type: 'number', step: 1 },
       { id: 'delta', label: 'Delta  (Δθ)',         val: 0.05, type: 'number', step: 0.01 },
       { id: 'tMin',  label: 'θ min',               val: 0,    type: 'number', step: 0.1 },
-      { id: 'tMax',  label: 'θ max',               val: 6.28, type: 'number', step: 0.1 }
+      { id: 'tMax',  label: 'θ max',               val: TWO_PI, type: 'number', step: 0.1 }
     ];
   }
 
@@ -83,23 +85,23 @@ function getParamDefs(curveType) {
 function getPresets(curveType) {
   if (curveType === 'circle') {
     return [
-      { name: 'Standar',    desc: 'r = 100',          params: { xc:0,   yc:0,  r:100, delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Besar',      desc: 'r = 200',          params: { xc:0,   yc:0,  r:200, delta:0.04, tMin:0, tMax:6.28 } },
-      { name: 'Geser Kiri', desc: 'xc = -100',        params: { xc:-100,yc:0,  r:80,  delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Geser Atas', desc: 'yc = 80',          params: { xc:0,   yc:80, r:70,  delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Detail',     desc: 'r=40, Δ=0.02',    params: { xc:0,   yc:0,  r:40,  delta:0.02, tMin:0, tMax:6.28 } },
-      { name: 'Pojok',      desc: 'r=70, pojok',      params: { xc:120, yc:100,r:70,  delta:0.05, tMin:0, tMax:6.28 } }
+      { name: 'Standar',    desc: 'r = 100',          params: { xc:0,   yc:0,  r:100, delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Besar',      desc: 'r = 200',          params: { xc:0,   yc:0,  r:200, delta:0.04, tMin:0, tMax:TWO_PI } },
+      { name: 'Geser Kiri', desc: 'xc = -100',        params: { xc:-100,yc:0,  r:80,  delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Geser Atas', desc: 'yc = 80',          params: { xc:0,   yc:80, r:70,  delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Detail',     desc: 'r=40, Δ=0.02',    params: { xc:0,   yc:0,  r:40,  delta:0.02, tMin:0, tMax:TWO_PI } },
+      { name: 'Pojok',      desc: 'r=70, pojok',      params: { xc:120, yc:100,r:70,  delta:0.05, tMin:0, tMax:TWO_PI } }
     ];
   }
 
   if (curveType === 'ellipse') {
     return [
-      { name: 'Standar',       desc: 'a=150, b=80',  params: { xc:0,  yc:0, a:150, b:80,  delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Vertikal',      desc: 'a=60, b=140',  params: { xc:0,  yc:0, a:60,  b:140, delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Lonjong',       desc: 'a=220, b=40',  params: { xc:0,  yc:0, a:220, b:40,  delta:0.04, tMin:0, tMax:6.28 } },
-      { name: 'Hampir Bulat',  desc: 'a=110, b=95',  params: { xc:0,  yc:0, a:110, b:95,  delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Geser Kanan',   desc: 'xc=100',       params: { xc:100,yc:0, a:100, b:60,  delta:0.05, tMin:0, tMax:6.28 } },
-      { name: 'Pipih',         desc: 'a=200, b=20',  params: { xc:0,  yc:0, a:200, b:20,  delta:0.04, tMin:0, tMax:6.28 } }
+      { name: 'Standar',       desc: 'a=150, b=80',  params: { xc:0,  yc:0, a:150, b:80,  delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Vertikal',      desc: 'a=60, b=140',  params: { xc:0,  yc:0, a:60,  b:140, delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Lonjong',       desc: 'a=220, b=40',  params: { xc:0,  yc:0, a:220, b:40,  delta:0.04, tMin:0, tMax:TWO_PI } },
+      { name: 'Hampir Bulat',  desc: 'a=110, b=95',  params: { xc:0,  yc:0, a:110, b:95,  delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Geser Kanan',   desc: 'xc=100',       params: { xc:100,yc:0, a:100, b:60,  delta:0.05, tMin:0, tMax:TWO_PI } },
+      { name: 'Pipih',         desc: 'a=200, b=20',  params: { xc:0,  yc:0, a:200, b:20,  delta:0.04, tMin:0, tMax:TWO_PI } }
     ];
   }
 

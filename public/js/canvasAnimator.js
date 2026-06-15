@@ -211,11 +211,11 @@ function animateCurve(pointsArray, speedMs, onDone) {
       var dx   = px - prevPx;
       var dy   = py - prevPy;
       var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 20) {
+      if (dist < 40) {
         ctx.save();
         ctx.strokeStyle  = grad;
-        ctx.lineWidth    = 1.6;
-        ctx.globalAlpha  = 0.6;
+        ctx.lineWidth    = 3;
+        ctx.globalAlpha  = 0.8;
         ctx.shadowColor  = '#5B8FFF';
         ctx.shadowBlur   = 4;
         ctx.beginPath();
