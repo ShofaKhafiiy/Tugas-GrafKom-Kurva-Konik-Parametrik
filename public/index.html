@@ -54,6 +54,15 @@
         <span class="speed-val" id="speedVal">8 ms</span>
       </div>
 
+      <!-- Tampilkan garis -->
+      <div class="toggle-row">
+        <label class="toggle-label" for="lineToggle">Tampilkan Garis</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="lineToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
       <!-- Tombol proses -->
       <button id="processBtn">▶&nbsp; Proses Gambar</button>
     </div>
@@ -92,10 +101,6 @@
       <!-- Canvas -->
       <div class="canvas-wrap" id="canvasWrap">
         <canvas id="mainCanvas" width="680" height="480"></canvas>
-        <div class="canvas-overlay" id="canvasOverlay">
-          <div class="overlay-icon">◎</div>
-          <div class="overlay-text">Klik "Proses Gambar" untuk memulai rendering</div>
-        </div>
       </div>
 
       <!-- Step log (4 langkah algoritma dari PPT) -->
@@ -113,9 +118,10 @@
     </div>
   </div>
 
-  <!-- Load JS: urutan wajib geometryCalc → canvasAnimator → ui -->
+  <!-- Load JS: urutan wajib geometryCalc → canvasAnimator → ui → test -->
   <script src="js/geometryCalc.js"></script>
   <script src="js/canvasAnimator.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/test.js"></script>
 </body>
 </html>

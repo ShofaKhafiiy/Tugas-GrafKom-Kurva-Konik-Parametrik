@@ -104,18 +104,28 @@ Jangan mengubah nama, parameter, atau return type fungsi dari US lain.
 
 | Fungsi | Parameter | Return |
 |--------|-----------|--------|
-| `calculateCircle` | `(xc, yc, r, delta, tMin, tMax)` | `[{x, y}, ...]` |
-| `calculateEllipse` | `(xc, yc, a, b, delta, tMin, tMax)` | `[{x, y}, ...]` |
-| `calculateParabola` | `(xc, yc, a, delta, tMin, tMax)` | `[{x, y}, ...]` |
-| `calculateHyperbola` | `(xc, yc, a, b, delta, tMin, tMax)` | `[{x, y}, ...]` |
-| `mapCoordinate` | `(x, y, w, h)` | `{x: number, y: number}` |
-| `drawGrid` | `(ctx, w, h)` | `void` |
-| `animateCurve` | `(pointsArray)` | `void` |
-| `renderParams` | `(curveType)` | `void` |
-| `validate` | `()` | `boolean` |
+| `calculateCircle` | `(xc, yc, r, delta, tMin, tMax)` | `[{x, y, t}, ...]` |
+| `calculateEllipse` | `(xc, yc, a, b, delta, tMin, tMax)` | `[{x, y, t}, ...]` |
+| `calculateParabola` | `(xc, yc, a, delta, tMin, tMax, orientation, maxExtent?)` | `[{x, y, t}, ...]` |
+| `calculateHyperbola` | `(xc, yc, a, b, delta, tMin, tMax, orientation)` | `[{x, y, t}, ...]` |
+| `mapCoordinate` | `(x, y)` | `{px: number, py: number}` |
+| `drawGrid` | `()` | `void` |
+| `animateCurve` | `(pointsArray, speedMs, onDone?)` | `void` |
+| `renderParams` | `(defs)` | `void` |
+| `validate` | `(vals, curveType)` | `boolean` |
 | `processCurve` | `()` | `void` |
-| `showAnalysis` | `(curveType)` | `void` |
-| `getParamDefs` | `(curveType)` | `[{id, label, value}, ...]` |
+| `showAnalysis` | `(curveType, vals)` | `void` |
+| `getParamDefs` | `(curveType)` | `[{id, label, val, type, ...}, ...]` |
+| `getBalancedParabolaRange` | `(a, orientation, maxExtent?)` | `{tMin, tMax}` |
+| `getPresets` | `(curveType)` | `[{name, desc, params}, ...]` |
+| `renderPresets` | `(presets)` | `void` |
+| `applyPreset` | `(preset)` | `void` |
+| `getFormValues` | `(defs)` | `{...}` |
+| `updateAnalysis` | `()` | `void` |
+| `renderParamsAndPresets` | `(curveType)` | `void` |
+| `addLog` | `(msg)` | `void` |
+| `initCanvas` | `()` | `void` |
+| `saveCurveToServer` | `(pointsArray)` | `void` |
 
 ## 7. Commit Message Format
 

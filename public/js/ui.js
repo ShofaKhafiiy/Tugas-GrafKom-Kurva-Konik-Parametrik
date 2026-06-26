@@ -18,9 +18,9 @@ function getParamDefs(curveType) {
       { id: 'xc',    label: 'Pusat X  (xc)',  val: 0,    type: 'number', step: 1 },
       { id: 'yc',    label: 'Pusat Y  (yc)',  val: 0,    type: 'number', step: 1 },
       { id: 'r',     label: 'Radius  (r)',     val: 100,  type: 'number', step: 1 },
-      { id: 'delta', label: 'Delta  (Δθ)',     val: 0.05, type: 'number', step: 0.01 },
-      { id: 'tMin',  label: 'θ min',           val: 0,    type: 'number', step: 0.1 },
-      { id: 'tMax',  label: 'θ max',           val: TWO_PI, type: 'number', step: 0.1 }
+      { id: 'delta', label: 'Delta  (Δθ rad)', val: 0.05, type: 'number', step: 0.01 },
+      { id: 'tMin',  label: 'θ min (rad)',     val: 0,    type: 'number', step: 0.1 },
+      { id: 'tMax',  label: 'θ max (rad)',     val: TWO_PI, type: 'number', step: 0.1 }
     ];
   }
 
@@ -30,9 +30,9 @@ function getParamDefs(curveType) {
       { id: 'yc',    label: 'Pusat Y  (yc)',      val: 0,    type: 'number', step: 1 },
       { id: 'a',     label: 'Semi-a  (horizontal)', val: 150, type: 'number', step: 1 },
       { id: 'b',     label: 'Semi-b  (vertikal)',  val: 80,  type: 'number', step: 1 },
-      { id: 'delta', label: 'Delta  (Δθ)',         val: 0.05, type: 'number', step: 0.01 },
-      { id: 'tMin',  label: 'θ min',               val: 0,    type: 'number', step: 0.1 },
-      { id: 'tMax',  label: 'θ max',               val: TWO_PI, type: 'number', step: 0.1 }
+      { id: 'delta', label: 'Delta  (Δθ rad)',   val: 0.05, type: 'number', step: 0.01 },
+      { id: 'tMin',  label: 'θ min (rad)',       val: 0,    type: 'number', step: 0.1 },
+      { id: 'tMax',  label: 'θ max (rad)',       val: TWO_PI, type: 'number', step: 0.1 }
     ];
   }
 
@@ -62,9 +62,9 @@ function getParamDefs(curveType) {
       { id: 'yc',    label: 'Pusat Y  (yc)',        val: 0,    type: 'number', step: 1 },
       { id: 'a',     label: 'Semi-a  (transversal)',val: 80,   type: 'number', step: 1 },
       { id: 'b',     label: 'Semi-b  (konjugasi)',  val: 60,   type: 'number', step: 1 },
-      { id: 'delta', label: 'Delta  (Δθ)',          val: 0.05, type: 'number', step: 0.01 },
-      { id: 'tMin',  label: 'θ min',                val: -1.4, type: 'number', step: 0.05 },
-      { id: 'tMax',  label: 'θ max',                val: 1.4,  type: 'number', step: 0.05 },
+      { id: 'delta', label: 'Delta  (Δθ rad)',    val: 0.05, type: 'number', step: 0.01 },
+      { id: 'tMin',  label: 'θ min (rad)',        val: -1.4, type: 'number', step: 0.05 },
+      { id: 'tMax',  label: 'θ max (rad)',        val: 1.4,  type: 'number', step: 0.05 },
       {
         id: 'orientation', label: 'Orientasi', val: 'horizontal', type: 'select',
         options: [
@@ -308,7 +308,16 @@ function showAnalysis(curveType, vals) {
   }
 
   if (curveType === 'hyperbola') {
-    var eH = Math.sqrt(1 + (vals.b * vals.b) / (vals.a * vals.a)).toFixed(4);
+    var eH, asimLabel, asimVal;
+    if (vals.orientation === 'vertical') {
+      eH = Math.sqrt(1 + (vals.a * vals.a) / (vals.b * vals.b)).toFixed(4);
+      asimLabel = 'Asimtot ±a/b';
+      asimVal = '±' + (vals.a / vals.b).toFixed(3) + 'x';
+    } else {
+      eH = Math.sqrt(1 + (vals.b * vals.b) / (vals.a * vals.a)).toFixed(4);
+      asimLabel = 'Asimtot ±b/a';
+      asimVal = '±' + (vals.b / vals.a).toFixed(3) + 'x';
+    }
     formula =
       'x = ' + vals.xc + ' + ' + vals.a + ' · sec(θ)\n' +
       'y = ' + vals.yc + ' + ' + vals.b + ' · tan(θ)\n' +
@@ -318,7 +327,7 @@ function showAnalysis(curveType, vals) {
       { label: 'Semi-a (transv.)', val: vals.a },
       { label: 'Semi-b (konjug.)', val: vals.b },
       { label: 'Eksentrisitas',    val: eH },
-      { label: 'Asimtot ±b/a',    val: '±' + (vals.b / vals.a).toFixed(3) + 'x' },
+      { label: asimLabel,          val: asimVal },
       { label: 'Estimasi Titik',   val: estPts }
     ];
   }
@@ -389,14 +398,22 @@ function processCurve() {
   } else if (curveType === 'ellipse') {
     points = calculateEllipse(vals.xc, vals.yc, vals.a, vals.b, vals.delta, vals.tMin, vals.tMax);
   } else if (curveType === 'parabola') {
-    points = calculateParabola(vals.xc, vals.yc, vals.a, vals.delta, vals.tMin, vals.tMax, vals.orientation);
+    var cvs = document.getElementById('mainCanvas');
+    var maxExt = Math.min(cvs.width, cvs.height) / 2 * 0.85;
+    points = calculateParabola(vals.xc, vals.yc, vals.a, vals.delta, vals.tMin, vals.tMax, vals.orientation, maxExt);
   } else if (curveType === 'hyperbola') {
     points = calculateHyperbola(vals.xc, vals.yc, vals.a, vals.b, vals.delta, vals.tMin, vals.tMax, vals.orientation);
+    var branchNames = [];
+    if (vals.orientation === 'horizontal') branchNames = ['Kanan', 'Kiri'];
+    else if (vals.orientation === 'vertical') branchNames = ['Atas', 'Bawah'];
+    else if (vals.orientation === 'left-branch') branchNames = ['Kiri'];
+    if (branchNames.length > 0) {
+      addLog('[ CABANG ] ' + branchNames.join(' + ') + ' — ' + branchNames.length + ' cabang');
+    }
   }
 
   addLog('[ TITIK ] ' + points.length + ' titik dihitung. Memulai animasi...');
   document.getElementById('processBtn').disabled = true;
-  document.getElementById('canvasOverlay').style.display = 'none';
 
   var speedMs = parseInt(document.getElementById('speedRange').value);
   animateCurve(points, speedMs, function(elapsed, total) {
@@ -436,6 +453,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Slider kecepatan
   document.getElementById('speedRange').addEventListener('input', function() {
     document.getElementById('speedVal').textContent = this.value + ' ms';
+  });
+
+  // Toggle tampilan garis
+  document.getElementById('lineToggle').addEventListener('change', function() {
+    AnimatorState.showLines = this.checked;
   });
 
   // Live analisis saat parameter diubah
