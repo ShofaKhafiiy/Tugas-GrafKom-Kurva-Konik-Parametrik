@@ -159,6 +159,18 @@ input[type='number']:focus {
   box-shadow: 0 0 0 3px rgba(91,143,255,0.15);
 }
 
+select option {
+  background: #121a26;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+}
+
+select option:checked {
+  background: rgba(91,143,255,0.35);
+  color: #fff;
+}
+
 input[type='number']::-webkit-inner-spin-button { opacity: 0.35; }
 
 label.field-label {
