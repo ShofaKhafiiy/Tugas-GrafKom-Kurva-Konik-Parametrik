@@ -407,7 +407,6 @@ function processCurve() {
 
   addLog('[ TITIK ] ' + points.length + ' titik dihitung. Memulai animasi...');
   document.getElementById('processBtn').disabled = true;
-  document.getElementById('canvasOverlay').style.display = 'none';
 
   var speedMs = parseInt(document.getElementById('speedRange').value);
   animateCurve(points, speedMs, function(elapsed, total) {

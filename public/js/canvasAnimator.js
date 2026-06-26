@@ -184,9 +184,6 @@ function animateCurve(pointsArray, speedMs, onDone) {
         '✓ Selesai! ' + elapsed + ' dtk, ' + total + ' titik';
       document.getElementById('processBtn').disabled = false;
 
-      // Kirim ke backend
-      saveCurveToServer(pointsArray);
-
       if (onDone) onDone(elapsed, total);
       return;
     }
@@ -249,26 +246,3 @@ function animateCurve(pointsArray, speedMs, onDone) {
   step();
 }
 
-// ------------------------------------------------------------
-// saveCurveToServer
-// POST ke Express backend /api/save-curve
-// ------------------------------------------------------------
-function saveCurveToServer(pointsArray) {
-  fetch('/api/save-curve', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      points: pointsArray,
-      totalPoints: pointsArray.length
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    if (data.status === 'ok') {
-      addLog('[ SERVER ] Data kurva tersimpan ke data/curves.json');
-    }
-  })
-  .catch(function(err) {
-    addLog('[ SERVER ] Gagal simpan: ' + err.message);
-  });
-}
