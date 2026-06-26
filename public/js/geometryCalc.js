@@ -64,21 +64,43 @@ function calculateCircle(xc, yc, r, delta, tMin, tMax) {
 }
 
 // ------------------------------------------------------------
-// ELIPS
+// ELIPS — 4-Way Symmetry (Kuadran)
 // x = xc + a · cos(θ)
 // y = yc + b · sin(θ)
-// θ ∈ [tMin, tMax], a = semi-horizontal, b = semi-vertikal
-// Jika a = b → menjadi lingkaran
+// θ ∈ [tMin, tMax]
+// Untuk elips penuh (0—2π): hitung hanya θ ∈ [0, π/2]
+//   (Kuadran 1), lalu mirror ke Kuadran 2, 3, 4 secara instan.
+//   Urutan titik di-sortir berdasarkan sudut agar animasi rapi.
 // ------------------------------------------------------------
 function calculateEllipse(xc, yc, a, b, delta, tMin, tMax) {
   var points = [];
-  var steps = Math.round((tMax - tMin) / delta);
-  if (steps < 1) steps = 1;
-  for (var i = 0; i <= steps; i++) {
-    var t = tMin + (tMax - tMin) * i / steps;
-    var x = xc + a * Math.cos(t);
-    var y = yc + b * Math.sin(t);
-    points.push({ x: x, y: y, t: t });
+  var range = tMax - tMin;
+  var isFullEllipse = range >= 2 * Math.PI - 0.001;
+
+  if (isFullEllipse) {
+    var quadSteps = Math.round((Math.PI / 2) / delta);
+    if (quadSteps < 1) quadSteps = 1;
+    for (var i = 0; i <= quadSteps; i++) {
+      var theta = (Math.PI / 2) * i / quadSteps;
+      var rx = a * Math.cos(theta);
+      var ry = b * Math.sin(theta);
+      points.push({ x: xc + rx, y: yc + ry, t: theta });
+      points.push({ x: xc - rx, y: yc + ry, t: Math.PI - theta });
+      points.push({ x: xc - rx, y: yc - ry, t: Math.PI + theta });
+      points.push({ x: xc + rx, y: yc - ry, t: 2 * Math.PI - theta });
+    }
+    points.sort(function(a, b) { return a.t - b.t; });
+  } else {
+    var steps = Math.round(range / delta);
+    if (steps < 1) steps = 1;
+    for (var i = 0; i <= steps; i++) {
+      var t = tMin + range * i / steps;
+      points.push({
+        x: xc + a * Math.cos(t),
+        y: yc + b * Math.sin(t),
+        t: t
+      });
+    }
   }
   return points;
 }

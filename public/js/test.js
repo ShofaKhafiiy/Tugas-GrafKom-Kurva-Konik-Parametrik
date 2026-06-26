@@ -58,6 +58,21 @@
   assert(hasPointNear(circlePoints, -100, 0), 'Titik (-100, 0) atau (-r, 0) ada');
   assert(hasPointNear(circlePoints, 0, -100), 'Titik (0, -100) atau (0, -r) ada');
 
+  // ── EXTRA: 4-WAY SYMMETRY ELIPS ──
+  console.log('[2b] 4-WAY SYMMETRY ELIPS');
+  console.log('    Memastikan elips menggunakan 4-way mirror Kuadran 1→2→3→4');
+  var ellPoints = calculateEllipse(0, 0, 150, 80, 1.0, 0, 2 * Math.PI);
+  assert(hasPointNear(ellPoints, 150, 0), 'Titik (a, 0) di Kuadran 1 ada');
+  assert(hasPointNear(ellPoints, 0, 80), 'Titik (0, b) di Kuadran 1/2 ada');
+  assert(hasPointNear(ellPoints, -150, 0), 'Titik (-a, 0) di Kuadran 2/3 ada');
+  assert(hasPointNear(ellPoints, 0, -80), 'Titik (0, -b) di Kuadran 3/4 ada');
+  // Test dengan delta besar — pastikan tetap 4-way simetris walau sedikit titik
+  var ellCoarse = calculateEllipse(0, 0, 150, 80, 0.5, 0, 2 * Math.PI);
+  assert(hasPointNear(ellCoarse, 150, 0), 'Delta=0.5: Titik (a, 0) ada');
+  assert(hasPointNear(ellCoarse, -150, 0), 'Delta=0.5: Titik (-a, 0) ada');
+  assert(hasPointNear(ellCoarse, 0, 80), 'Delta=0.5: Titik (0, b) ada');
+  assert(hasPointNear(ellCoarse, 0, -80), 'Delta=0.5: Titik (0, -b) ada');
+
   // ── FEEDBACK 3: RADIAN ──
   console.log('[3] KONVERSI RADIAN');
   console.log('    Memastikan fungsi degToRad ada dan label menggunakan (rad)');
