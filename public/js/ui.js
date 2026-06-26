@@ -308,7 +308,16 @@ function showAnalysis(curveType, vals) {
   }
 
   if (curveType === 'hyperbola') {
-    var eH = Math.sqrt(1 + (vals.b * vals.b) / (vals.a * vals.a)).toFixed(4);
+    var eH, asimLabel, asimVal;
+    if (vals.orientation === 'vertical') {
+      eH = Math.sqrt(1 + (vals.a * vals.a) / (vals.b * vals.b)).toFixed(4);
+      asimLabel = 'Asimtot ±a/b';
+      asimVal = '±' + (vals.a / vals.b).toFixed(3) + 'x';
+    } else {
+      eH = Math.sqrt(1 + (vals.b * vals.b) / (vals.a * vals.a)).toFixed(4);
+      asimLabel = 'Asimtot ±b/a';
+      asimVal = '±' + (vals.b / vals.a).toFixed(3) + 'x';
+    }
     formula =
       'x = ' + vals.xc + ' + ' + vals.a + ' · sec(θ)\n' +
       'y = ' + vals.yc + ' + ' + vals.b + ' · tan(θ)\n' +
@@ -318,7 +327,7 @@ function showAnalysis(curveType, vals) {
       { label: 'Semi-a (transv.)', val: vals.a },
       { label: 'Semi-b (konjug.)', val: vals.b },
       { label: 'Eksentrisitas',    val: eH },
-      { label: 'Asimtot ±b/a',    val: '±' + (vals.b / vals.a).toFixed(3) + 'x' },
+      { label: asimLabel,          val: asimVal },
       { label: 'Estimasi Titik',   val: estPts }
     ];
   }
@@ -389,7 +398,9 @@ function processCurve() {
   } else if (curveType === 'ellipse') {
     points = calculateEllipse(vals.xc, vals.yc, vals.a, vals.b, vals.delta, vals.tMin, vals.tMax);
   } else if (curveType === 'parabola') {
-    points = calculateParabola(vals.xc, vals.yc, vals.a, vals.delta, vals.tMin, vals.tMax, vals.orientation);
+    var cvs = document.getElementById('mainCanvas');
+    var maxExt = Math.min(cvs.width, cvs.height) / 2 * 0.85;
+    points = calculateParabola(vals.xc, vals.yc, vals.a, vals.delta, vals.tMin, vals.tMax, vals.orientation, maxExt);
   } else if (curveType === 'hyperbola') {
     points = calculateHyperbola(vals.xc, vals.yc, vals.a, vals.b, vals.delta, vals.tMin, vals.tMax, vals.orientation);
   }

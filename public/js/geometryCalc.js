@@ -51,8 +51,8 @@ function calculateEllipse(xc, yc, a, b, delta, tMin, tMax) {
 // (xp, yp) = titik puncak (vertex), a = parameter fokus
 // t ∈ [tMin, tMax], step akurat (step count) agar imbang
 // ------------------------------------------------------------
-function getBalancedParabolaRange(a, orientation) {
-  var m = 200;
+function getBalancedParabolaRange(a, orientation, maxExtent) {
+  var m = maxExtent || 200;
   if (orientation === 'right' || orientation === 'left') {
     var tFromX = Math.sqrt(m / a);
     var tFromY = m / (2 * a);
@@ -64,9 +64,9 @@ function getBalancedParabolaRange(a, orientation) {
   }
 }
 
-function calculateParabola(xc, yc, a, delta, tMin, tMax, orientation) {
+function calculateParabola(xc, yc, a, delta, tMin, tMax, orientation, maxExtent) {
   var points = [];
-  var r = getBalancedParabolaRange(a, orientation);
+  var r = getBalancedParabolaRange(a, orientation, maxExtent);
   var adjMin = Math.max(tMin, r.tMin);
   var adjMax = Math.min(tMax, r.tMax);
   var steps = Math.round((adjMax - adjMin) / delta);
@@ -121,7 +121,6 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
-      if (Math.abs(cosT) < 0.015) continue;
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
       points.push({ x: xc + a * secT, y: yc + b * tanT, t: t });
@@ -129,7 +128,6 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
-      if (Math.abs(cosT) < 0.015) continue;
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
       points.push({ x: xc - a * secT, y: yc + b * tanT, t: t + Math.PI });
@@ -138,7 +136,6 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
-      if (Math.abs(cosT) < 0.015) continue;
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
       points.push({ x: xc + b * tanT, y: yc + a * secT, t: t });
@@ -146,7 +143,6 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
-      if (Math.abs(cosT) < 0.015) continue;
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
       points.push({ x: xc + b * tanT, y: yc - a * secT, t: t + Math.PI });
@@ -155,7 +151,6 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
-      if (Math.abs(cosT) < 0.015) continue;
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
       points.push({ x: xc - a * secT, y: yc + b * tanT, t: t + Math.PI });
