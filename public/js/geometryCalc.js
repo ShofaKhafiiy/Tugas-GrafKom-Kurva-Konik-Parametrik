@@ -4,20 +4,61 @@
 // ============================================================
 
 // ------------------------------------------------------------
-// LINGKARAN
+// degToRad — konversi derajat → radian
+// Fungsi trigonometri JS (Math.sin/cos/tan) menerima RADIAN
+// ------------------------------------------------------------
+function degToRad(deg) {
+  return deg * Math.PI / 180;
+}
+
+// ------------------------------------------------------------
+// LINGKARAN — 8-Way Symmetry (Oktant)
 // x = xc + r · cos(θ)
 // y = yc + r · sin(θ)
-// θ ∈ [tMin, tMax], step akurat (step count) agar simetri
+// θ ∈ [tMin, tMax]
+// Untuk lingkaran penuh (0—2π): hitung hanya θ ∈ [0, π/4],
+//   lalu mirror ke 7 oktan lain → simetri sempurna.
 // ------------------------------------------------------------
 function calculateCircle(xc, yc, r, delta, tMin, tMax) {
   var points = [];
-  var steps = Math.round((tMax - tMin) / delta);
-  if (steps < 1) steps = 1;
-  for (var i = 0; i <= steps; i++) {
-    var t = tMin + (tMax - tMin) * i / steps;
-    var x = xc + r * Math.cos(t);
-    var y = yc + r * Math.sin(t);
-    points.push({ x: x, y: y, t: t });
+  var range = tMax - tMin;
+  var isFullCircle = range >= 2 * Math.PI - 0.001;
+
+  if (isFullCircle) {
+    var octSteps = Math.round((Math.PI / 4) / delta);
+    if (octSteps < 1) octSteps = 1;
+    for (var i = 0; i <= octSteps; i++) {
+      var theta = (Math.PI / 4) * i / octSteps;
+      var cosT = Math.cos(theta);
+      var sinT = Math.sin(theta);
+      var rx = r * cosT;
+      var ry = r * sinT;
+      var pts = [
+        { x: xc + rx, y: yc + ry, t: theta },
+        { x: xc + ry, y: yc + rx, t: Math.PI / 2 - theta },
+        { x: xc - ry, y: yc + rx, t: Math.PI / 2 + theta },
+        { x: xc - rx, y: yc + ry, t: Math.PI - theta },
+        { x: xc - rx, y: yc - ry, t: Math.PI + theta },
+        { x: xc - ry, y: yc - rx, t: 3 * Math.PI / 2 - theta },
+        { x: xc + ry, y: yc - rx, t: 3 * Math.PI / 2 + theta },
+        { x: xc + rx, y: yc - ry, t: 2 * Math.PI - theta }
+      ];
+      for (var j = 0; j < pts.length; j++) {
+        points.push(pts[j]);
+      }
+    }
+    points.sort(function(a, b) { return a.t - b.t; });
+  } else {
+    var steps = Math.round(range / delta);
+    if (steps < 1) steps = 1;
+    for (var i = 0; i <= steps; i++) {
+      var t = tMin + range * i / steps;
+      points.push({
+        x: xc + r * Math.cos(t),
+        y: yc + r * Math.sin(t),
+        t: t
+      });
+    }
   }
   return points;
 }
@@ -72,7 +113,12 @@ function calculateParabola(xc, yc, a, delta, tMin, tMax, orientation, maxExtent)
   var steps = Math.round((adjMax - adjMin) / delta);
   if (steps < 1) steps = 1;
   for (var i = 0; i <= steps; i++) {
-    var t = adjMin + (adjMax - adjMin) * i / steps;
+    // Power-law: spread titik lebih merata (konsentrasi di ujung)
+    // agar gradien parabola yang curam di |t| besar terkompensasi
+    var u = i / steps;
+    var v = 2 * u - 1;
+    var biased = (v >= 0 ? 1 : -1) * Math.pow(Math.abs(v), 0.55);
+    var t = (adjMin + adjMax) / 2 + ((adjMax - adjMin) / 2) * biased;
     var x, y;
     if (orientation === 'right') {
       x = xc + a * t * t;
@@ -123,14 +169,16 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
       var cosT = Math.cos(t);
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
-      points.push({ x: xc + a * secT, y: yc + b * tanT, t: t });
+      points.push({ x: xc + a * secT, y: yc + b * tanT, t: t, branch: 'Kanan' });
     }
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
-      points.push({ x: xc - a * secT, y: yc + b * tanT, t: t + Math.PI });
+      var p = { x: xc - a * secT, y: yc + b * tanT, t: t + Math.PI, branch: 'Kiri' };
+      if (i === 0) p.newBranch = true;
+      points.push(p);
     }
   } else if (orientation === 'vertical') {
     for (var i = 0; i <= steps; i++) {
@@ -138,14 +186,16 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
       var cosT = Math.cos(t);
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
-      points.push({ x: xc + b * tanT, y: yc + a * secT, t: t });
+      points.push({ x: xc + b * tanT, y: yc + a * secT, t: t, branch: 'Atas' });
     }
     for (var i = 0; i <= steps; i++) {
       var t = safeMin + (safeMax - safeMin) * i / steps;
       var cosT = Math.cos(t);
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
-      points.push({ x: xc + b * tanT, y: yc - a * secT, t: t + Math.PI });
+      var p = { x: xc + b * tanT, y: yc - a * secT, t: t + Math.PI, branch: 'Bawah' };
+      if (i === 0) p.newBranch = true;
+      points.push(p);
     }
   } else if (orientation === 'left-branch') {
     for (var i = 0; i <= steps; i++) {
@@ -153,7 +203,7 @@ function calculateHyperbola(xc, yc, a, b, delta, tMin, tMax, orientation) {
       var cosT = Math.cos(t);
       var secT = 1 / cosT;
       var tanT = Math.tan(t);
-      points.push({ x: xc - a * secT, y: yc + b * tanT, t: t + Math.PI });
+      points.push({ x: xc - a * secT, y: yc + b * tanT, t: t + Math.PI, branch: 'Kiri' });
     }
   }
   return points;

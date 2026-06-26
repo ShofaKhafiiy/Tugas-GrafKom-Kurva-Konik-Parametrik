@@ -148,6 +148,29 @@ function drawGrid() {
 }
 
 // ------------------------------------------------------------
+// drawLineDDA — Digital Differential Analyzer
+// Menghasilkan titik-titik antara (x0,y0) dan (x1,y1)
+// ------------------------------------------------------------
+function drawLineDDA(ctx, x0, y0, x1, y1, color, radius) {
+  var dx = x1 - x0;
+  var dy = y1 - y0;
+  var steps = Math.round(Math.max(Math.abs(dx), Math.abs(dy)));
+  if (steps < 1) return;
+  var xInc = dx / steps;
+  var yInc = dy / steps;
+  var x = x0;
+  var y = y0;
+  ctx.fillStyle = color;
+  for (var i = 0; i <= steps; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.round(x), Math.round(y), radius || 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    x += xInc;
+    y += yInc;
+  }
+}
+
+// ------------------------------------------------------------
 // animateCurve
 // Render titik satu per satu dengan animasi requestAnimationFrame
 // pointsArray : array { x, y, t } dari geometryCalc
@@ -193,6 +216,12 @@ function animateCurve(pointsArray, speedMs, onDone) {
     var px     = mapped.px;
     var py     = mapped.py;
 
+    // Angkat pulpen jika titik ini memulai cabang baru (hiperbola)
+    if (pt.newBranch) {
+      prevPx = null;
+      prevPy = null;
+    }
+
     // Titik dengan shadow glow
     ctx.save();
     ctx.shadowColor = '#5B8FFF';
@@ -203,24 +232,14 @@ function animateCurve(pointsArray, speedMs, onDone) {
     ctx.fill();
     ctx.restore();
 
-    // Garis penghubung jika titik sebelumnya berdekatan (< 20px)
+    // Garis penghubung DDA — selalu gambar antar titik berurutan
     if (prevPx !== null) {
-      var dx   = px - prevPx;
-      var dy   = py - prevPy;
-      var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 40) {
-        ctx.save();
-        ctx.strokeStyle  = grad;
-        ctx.lineWidth    = 3;
-        ctx.globalAlpha  = 0.8;
-        ctx.shadowColor  = '#5B8FFF';
-        ctx.shadowBlur   = 4;
-        ctx.beginPath();
-        ctx.moveTo(prevPx, prevPy);
-        ctx.lineTo(px, py);
-        ctx.stroke();
-        ctx.restore();
-      }
+      ctx.save();
+      ctx.shadowColor = '#5B8FFF';
+      ctx.shadowBlur  = 4;
+      ctx.globalAlpha = 0.7;
+      drawLineDDA(ctx, prevPx, prevPy, px, py, grad, 1.5);
+      ctx.restore();
     }
 
     prevPx = px;
@@ -231,8 +250,9 @@ function animateCurve(pointsArray, speedMs, onDone) {
     document.getElementById('valX').textContent = pt.x.toFixed(2);
     document.getElementById('valY').textContent = pt.y.toFixed(2);
     document.getElementById('valT').textContent = pt.t.toFixed(3);
+    var branchInfo = pt.branch ? ' | Cabang: ' + pt.branch : '';
     document.getElementById('statusText').textContent =
-      'Merender... ' + i + ' dari ' + total;
+      'Merender... ' + i + ' dari ' + total + branchInfo;
 
     if (speedMs > 0) {
       setTimeout(function() {
