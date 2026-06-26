@@ -11,7 +11,8 @@ var AnimatorState = {
   ctx: null,
   W: 0,
   H: 0,
-  animId: null
+  animId: null,
+  showLines: true
 };
 
 // ------------------------------------------------------------
@@ -233,7 +234,7 @@ function animateCurve(pointsArray, speedMs, onDone) {
     ctx.restore();
 
     // Garis penghubung DDA — selalu gambar antar titik berurutan
-    if (prevPx !== null) {
+    if (prevPx !== null && AnimatorState.showLines) {
       ctx.save();
       ctx.shadowColor = '#5B8FFF';
       ctx.shadowBlur  = 4;

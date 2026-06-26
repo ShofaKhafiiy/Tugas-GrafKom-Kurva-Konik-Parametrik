@@ -455,6 +455,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('speedVal').textContent = this.value + ' ms';
   });
 
+  // Toggle tampilan garis
+  document.getElementById('lineToggle').addEventListener('change', function() {
+    AnimatorState.showLines = this.checked;
+  });
+
   // Live analisis saat parameter diubah
   document.getElementById('paramContainer').addEventListener('input', function() {
     updateAnalysis();
