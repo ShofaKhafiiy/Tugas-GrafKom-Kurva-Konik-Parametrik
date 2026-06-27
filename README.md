@@ -368,6 +368,7 @@ Urutan merge wajib: `main → US-1.1 → US-1.2 → US-2.1 → US-2.2 → main`
 | <img src="https://avatars.githubusercontent.com/u/118283737?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **MBOEDIK** | [@MBOEDIK](https://github.com/MBOEDIK) | 9 commits |
 | <img src="https://avatars.githubusercontent.com/u/142008212?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **ShofaKhafiiy** | [@ShofaKhafiiy](https://github.com/ShofaKhafiiy) | 7 commits |
 | <img src="https://avatars.githubusercontent.com/u/140729456?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **Irwand13** | [@Irwand13](https://github.com/Irwand13) | 4 commits |
+| <img src="https://avatars.githubusercontent.com/u/181911741?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **iiooo920** | [@iiooo920](https://github.com/iiooo920) | 1 commit |
 
 *Data kontributor diambil langsung dari GitHub API melalui `gh CLI`.*
 
