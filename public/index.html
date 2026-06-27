@@ -3,38 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kurva Konik Parametrik</title>
+  <title>Kurva Konik — Grafika Komputer</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════ NAVBAR -->
+<!-- ══════════════════════════════════ NAVBAR (IDE titlebar) -->
 <nav class="navbar">
   <div class="nav-brand">
-    <span class="nav-dot"></span>
-    <span class="nav-title">Grafika Komputer — Kurva Konik</span>
+    <div class="nav-dots">
+      <span class="nd-r"></span>
+      <span class="nd-y"></span>
+      <span class="nd-g"></span>
+    </div>
+    <span class="nav-path">grafika-komputer / <span>kurva-konik-parametrik</span></span>
   </div>
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
-    <span class="theme-icon" id="themeIcon">🌙</span>
-    <span class="theme-label" id="themeLabel">Mode Gelap</span>
-  </button>
+  <div class="nav-right">
+    <span class="nav-tag">Bresenham + DDA</span>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
+      <span class="theme-icon" id="themeIcon">🌙</span>
+      <span class="theme-label" id="themeLabel">Dark</span>
+    </button>
+  </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════════ HEADER -->
-<header>
-  <h1>Pembangkitan Kurva Konik Parametrik</h1>
-  <p>Lingkaran · Elips · Parabola · Hiperbola — Algoritma Bresenham + DDA</p>
-</header>
+<!-- ══════════════════════════════════ HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Pembangkitan Parametrik</div>
+    <h1>Kurva <em>Konik</em></h1>
+    <div class="hero-sub">Lingkaran · Elips · Parabola · Hiperbola</div>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-meta-row">
+      <div class="hero-meta-dot"></div>
+      <span class="hero-meta-label">Renderer</span>
+      <span class="hero-meta-val">Active</span>
+    </div>
+    <div class="hero-meta-row" style="margin-top:2px;">
+      <span class="hero-meta-label" style="margin-left:11px;">Algo</span>
+      <span class="hero-meta-val">Bresenham</span>
+    </div>
+  </div>
+</div>
 
-<!-- ═══════════════════════════════════════════ DASHBOARD -->
-<div class="dashboard">
+<!-- ══════════════════════════════════ WORKSPACE -->
+<div class="workspace">
 
-  <!-- ════════════════════════════════════ LEFT PANEL -->
-  <div class="left-col">
+  <!-- ═══════════════════ SIDEBAR (property inspector) -->
+  <aside class="sidebar">
 
     <!-- Pilih Kurva -->
-    <div class="panel">
-      <div class="panel-title">Pilih Kurva</div>
+    <div class="sb-section">
+      <div class="sb-head">
+        <span class="sb-title">Tipe Kurva</span>
+      </div>
       <select id="curveSelect">
         <option value="circle">⬤  Lingkaran</option>
         <option value="ellipse">⬭  Elips</option>
@@ -44,22 +67,29 @@
     </div>
 
     <!-- Preset -->
-    <div class="panel">
-      <div class="panel-title">Preset Cepat</div>
+    <div class="sb-section">
+      <div class="sb-head">
+        <span class="sb-title">Preset</span>
+        <span class="sb-badge">6</span>
+      </div>
       <div class="preset-grid" id="presetGrid"></div>
     </div>
 
     <!-- Parameter -->
-    <div class="panel">
-      <div class="panel-title">Parameter Masukan</div>
+    <div class="sb-section">
+      <div class="sb-head">
+        <span class="sb-title">Parameter</span>
+      </div>
       <div class="param-grid" id="paramContainer"></div>
     </div>
 
-    <!-- Kontrol -->
-    <div class="panel">
-      <div class="panel-title">Kontrol Animasi</div>
-      <div class="speed-row">
-        <label for="speedRange">Kecepatan</label>
+    <!-- Controls -->
+    <div class="sb-section">
+      <div class="sb-head">
+        <span class="sb-title">Kontrol</span>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Speed</span>
         <input type="range" id="speedRange" min="0" max="50" value="0" step="1" />
         <span class="speed-val" id="speedVal">0 ms</span>
       </div>
@@ -71,79 +101,83 @@
         </label>
       </div>
       <div class="section-sep"></div>
-      <button id="processBtn">▶  Proses &amp; Gambar</button>
+      <button id="processBtn">▶ &nbsp;Render Kurva</button>
     </div>
 
-  </div><!-- /left-col -->
+    <!-- Analysis -->
+    <div class="sb-section" id="analysisPanel">
+      <div class="sb-head">
+        <span class="sb-title">Analisis</span>
+      </div>
+      <div class="analysis-title">Formula Parametrik</div>
+      <pre class="analysis-formula" id="formulaBox"></pre>
+      <div class="props-grid" id="propsGrid"></div>
+    </div>
 
-  <!-- ═══════════════════════════════════ RIGHT COLUMN -->
-  <div class="right-col">
+  </aside>
 
-    <!-- Info Chips -->
-    <div class="info-bar">
-      <div class="info-chip" id="chip-x">
-        <div class="chip-label">X</div>
-        <div class="chip-val" id="valX">—</div>
+  <!-- ═══════════════════ MAIN AREA (canvas + bars) -->
+  <div class="main-area">
+
+    <!-- Status bar — X Y T di atas canvas -->
+    <div class="statusbar">
+      <div class="sb-chip" id="chip-x-wrap">
+        <span class="sb-chip-label">x</span>
+        <span class="sb-chip-val" id="valX">—</span>
       </div>
-      <div class="info-chip" id="chip-y">
-        <div class="chip-label">Y</div>
-        <div class="chip-val" id="valY">—</div>
+      <div class="sb-chip" id="chip-y-wrap">
+        <span class="sb-chip-label">y</span>
+        <span class="sb-chip-val" id="valY">—</span>
       </div>
-      <div class="info-chip" id="chip-t">
-        <div class="chip-label">T / θ</div>
-        <div class="chip-val" id="valT">—</div>
+      <div class="sb-chip" id="chip-t-wrap">
+        <span class="sb-chip-label">t/θ</span>
+        <span class="sb-chip-val" id="valT">—</span>
       </div>
-      <div class="info-chip" id="chip-status">
-        <div class="chip-label">Status</div>
-        <div class="chip-val" id="statusText">Siap – pilih kurva dan tekan Proses</div>
+      <div class="sb-chip" id="chip-st-wrap">
+        <span class="sb-chip-val" id="statusText">Pilih kurva → Render</span>
       </div>
     </div>
 
     <!-- Canvas -->
     <div class="canvas-wrap">
-      <canvas id="mainCanvas" width="760" height="500"></canvas>
+      <canvas id="mainCanvas" width="760" height="480"></canvas>
     </div>
 
-    <!-- Step Log -->
-    <div class="panel log-panel">
-      <div class="panel-title">Log Langkah Algoritma</div>
+    <!-- Bottom bar — log -->
+    <div class="bottombar">
+      <div class="bb-tabs">
+        <div class="bb-tab active">Output Log</div>
+      </div>
       <div id="stepLog"></div>
     </div>
 
-    <!-- Analysis Panel -->
-    <div id="analysisPanel">
-      <div class="analysis-title">▸ Analisis Kurva</div>
-      <pre class="analysis-formula" id="formulaBox"></pre>
-      <div class="props-grid" id="propsGrid"></div>
-    </div>
+  </div><!-- /main-area -->
 
-  </div><!-- /right-col -->
-
-</div><!-- /dashboard -->
+</div><!-- /workspace -->
 
 <script src="js/geometryCalc.js"></script>
 <script src="js/canvasAnimator.js"></script>
 <script src="js/ui.js"></script>
 
 <script>
-  (function() {
-    var btn   = document.getElementById('themeToggle');
-    var icon  = document.getElementById('themeIcon');
-    var label = document.getElementById('themeLabel');
-    var body  = document.body;
-    var saved = localStorage.getItem('kurva-theme');
-    if (saved === 'light') {
-      body.classList.add('light');
-      icon.textContent  = '☀️';
-      label.textContent = 'Mode Terang';
-    }
-    btn.addEventListener('click', function() {
-      var isLight = body.classList.toggle('light');
-      icon.textContent  = isLight ? '☀️' : '🌙';
-      label.textContent = isLight ? 'Mode Terang' : 'Mode Gelap';
-      localStorage.setItem('kurva-theme', isLight ? 'light' : 'dark');
-    });
-  })();
+(function() {
+  var btn   = document.getElementById('themeToggle');
+  var icon  = document.getElementById('themeIcon');
+  var label = document.getElementById('themeLabel');
+  var body  = document.body;
+  var saved = localStorage.getItem('kurva-theme');
+  if (saved === 'light') {
+    body.classList.add('light');
+    icon.textContent  = '☀️';
+    label.textContent = 'Light';
+  }
+  btn.addEventListener('click', function() {
+    var isLight = body.classList.toggle('light');
+    icon.textContent  = isLight ? '☀️' : '🌙';
+    label.textContent = isLight ? 'Light' : 'Dark';
+    localStorage.setItem('kurva-theme', isLight ? 'light' : 'dark');
+  });
+})();
 </script>
 
 </body>
