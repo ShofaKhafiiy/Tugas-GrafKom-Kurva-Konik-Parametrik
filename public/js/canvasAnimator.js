@@ -149,25 +149,29 @@ function drawGrid() {
 }
 
 // ------------------------------------------------------------
-// drawLineDDA — Digital Differential Analyzer
+// drawLineBresenham — Algoritma Bresenham
 // Menghasilkan titik-titik antara (x0,y0) dan (x1,y1)
+// Menggunakan integer arithmetic — tanpa floating point
 // ------------------------------------------------------------
-function drawLineDDA(ctx, x0, y0, x1, y1, color, radius) {
-  var dx = x1 - x0;
-  var dy = y1 - y0;
-  var steps = Math.round(Math.max(Math.abs(dx), Math.abs(dy)));
-  if (steps < 1) return;
-  var xInc = dx / steps;
-  var yInc = dy / steps;
-  var x = x0;
-  var y = y0;
+function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {
+  var ix = Math.round(x0);
+  var iy = Math.round(y0);
+  var ex = Math.round(x1);
+  var ey = Math.round(y1);
+  var dx = Math.abs(ex - ix);
+  var dy = -Math.abs(ey - iy);
+  var sx = ix < ex ? 1 : -1;
+  var sy = iy < ey ? 1 : -1;
+  var err = dx + dy;
   ctx.fillStyle = color;
-  for (var i = 0; i <= steps; i++) {
+  while (true) {
     ctx.beginPath();
-    ctx.arc(Math.round(x), Math.round(y), radius || 1.5, 0, Math.PI * 2);
+    ctx.arc(ix, iy, radius || 1.5, 0, Math.PI * 2);
     ctx.fill();
-    x += xInc;
-    y += yInc;
+    if (ix === ex && iy === ey) break;
+    var e2 = 2 * err;
+    if (e2 >= dy) { err += dy; ix += sx; }
+    if (e2 <= dx) { err += dx; iy += sy; }
   }
 }
 
@@ -233,13 +237,13 @@ function animateCurve(pointsArray, speedMs, onDone) {
     ctx.fill();
     ctx.restore();
 
-    // Garis penghubung DDA — selalu gambar antar titik berurutan
+    // Garis penghubung Bresenham — selalu gambar antar titik berurutan
     if (prevPx !== null && AnimatorState.showLines) {
       ctx.save();
       ctx.shadowColor = '#5B8FFF';
       ctx.shadowBlur  = 4;
       ctx.globalAlpha = 0.7;
-      drawLineDDA(ctx, prevPx, prevPy, px, py, grad, 1.5);
+      drawLineBresenham(ctx, prevPx, prevPy, px, py, grad, 1.5);
       ctx.restore();
     }
 
