@@ -1,127 +1,150 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kurva Konik Parametrik — Grafika Komputer</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kurva Konik Parametrik</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <!-- ══ HEADER ══ -->
-  <header>
-    <div class="header-badge">GRAFIKA KOMPUTER — SEMESTER 4</div>
-    <h1>Pembangkitan Kurva Konik Parametrik</h1>
-    <p>Lingkaran · Elips · Parabola · Hiperbola &nbsp;|&nbsp; Algoritma Representasi Parametrik Step-by-Step</p>
-  </header>
+<!-- ═══════════════════════════════════════════════ NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="nav-dot"></span>
+    <span class="nav-title">Grafika Komputer — Kurva Konik</span>
+  </div>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
+    <span class="theme-icon" id="themeIcon">🌙</span>
+    <span class="theme-label" id="themeLabel">Mode Gelap</span>
+  </button>
+</nav>
 
-  <!-- ══ DASHBOARD: 2 KOLOM ══ -->
-  <div class="dashboard">
+<!-- ═══════════════════════════════════════════════ HEADER -->
+<header>
+  <h1>Pembangkitan Kurva Konik Parametrik</h1>
+  <p>Lingkaran · Elips · Parabola · Hiperbola — Algoritma Bresenham + DDA</p>
+</header>
 
-    <!-- ── KIRI: PANEL KONTROL ── -->
-    <div class="panel" id="leftPanel">
+<!-- ═══════════════════════════════════════════ DASHBOARD -->
+<div class="dashboard">
 
-      <!-- Pilih Kurva -->
+  <!-- ════════════════════════════════════ LEFT PANEL -->
+  <div class="left-col">
+
+    <!-- Pilih Kurva -->
+    <div class="panel">
       <div class="panel-title">Pilih Kurva</div>
-      <div class="field" style="margin-bottom:0">
-        <select id="curveSelect">
-          <option value="circle">⬤&nbsp; Lingkaran</option>
-          <option value="ellipse">⬭&nbsp; Elips</option>
-          <option value="parabola">∪&nbsp; Parabola</option>
-          <option value="hyperbola">⋈&nbsp; Hiperbola</option>
-        </select>
-      </div>
+      <select id="curveSelect">
+        <option value="circle">⬤  Lingkaran</option>
+        <option value="ellipse">⬭  Elips</option>
+        <option value="parabola">⌒  Parabola</option>
+        <option value="hyperbola">⌖  Hiperbola</option>
+      </select>
+    </div>
 
-      <div class="section-sep"></div>
-
-      <!-- Preset -->
+    <!-- Preset -->
+    <div class="panel">
       <div class="panel-title">Preset Cepat</div>
       <div class="preset-grid" id="presetGrid"></div>
+    </div>
 
-      <div class="section-sep"></div>
-
-      <!-- Parameter -->
+    <!-- Parameter -->
+    <div class="panel">
       <div class="panel-title">Parameter Masukan</div>
       <div class="param-grid" id="paramContainer"></div>
+    </div>
 
-      <div class="section-sep"></div>
-
-      <!-- Kecepatan animasi -->
-      <div class="panel-title">Kecepatan Animasi</div>
+    <!-- Kontrol -->
+    <div class="panel">
+      <div class="panel-title">Kontrol Animasi</div>
       <div class="speed-row">
-        <label>Delay/titik</label>
-        <input type="range" id="speedRange" min="0" max="50" value="8">
-        <span class="speed-val" id="speedVal">8 ms</span>
+        <label for="speedRange">Kecepatan</label>
+        <input type="range" id="speedRange" min="0" max="50" value="0" step="1" />
+        <span class="speed-val" id="speedVal">0 ms</span>
       </div>
-
-      <!-- Tampilkan garis -->
       <div class="toggle-row">
-        <label class="toggle-label" for="lineToggle">Tampilkan Garis</label>
+        <span class="toggle-label">Tampilkan Garis</span>
         <label class="toggle-switch">
-          <input type="checkbox" id="lineToggle" checked>
+          <input type="checkbox" id="lineToggle" checked />
           <span class="toggle-slider"></span>
         </label>
       </div>
-
-      <!-- Tombol proses -->
-      <button id="processBtn">▶&nbsp; Proses Gambar</button>
+      <div class="section-sep"></div>
+      <button id="processBtn">▶  Proses &amp; Gambar</button>
     </div>
 
-    <!-- ── KANAN: CANVAS + INFO ── -->
-    <div class="right-col">
+  </div><!-- /left-col -->
 
-      <!-- Info chips: live koordinat + status -->
-      <div class="info-bar">
-        <div class="info-chip" id="chip-x">
-          <div>
-            <div class="chip-label">KOORDINAT X</div>
-            <div class="chip-val" id="valX">—</div>
-          </div>
-        </div>
-        <div class="info-chip" id="chip-y">
-          <div>
-            <div class="chip-label">KOORDINAT Y</div>
-            <div class="chip-val" id="valY">—</div>
-          </div>
-        </div>
-        <div class="info-chip" id="chip-t">
-          <div>
-            <div class="chip-label">PARAMETER t / θ</div>
-            <div class="chip-val" id="valT">—</div>
-          </div>
-        </div>
-        <div class="info-chip" id="chip-status">
-          <div>
-            <div class="chip-label">STATUS</div>
-            <div class="chip-val" id="statusText">Siap — pilih kurva dan klik Proses</div>
-          </div>
-        </div>
+  <!-- ═══════════════════════════════════ RIGHT COLUMN -->
+  <div class="right-col">
+
+    <!-- Info Chips -->
+    <div class="info-bar">
+      <div class="info-chip" id="chip-x">
+        <div class="chip-label">X</div>
+        <div class="chip-val" id="valX">—</div>
       </div>
-
-      <!-- Canvas -->
-      <div class="canvas-wrap" id="canvasWrap">
-        <canvas id="mainCanvas" width="680" height="480"></canvas>
+      <div class="info-chip" id="chip-y">
+        <div class="chip-label">Y</div>
+        <div class="chip-val" id="valY">—</div>
       </div>
-
-      <!-- Step log (4 langkah algoritma dari PPT) -->
-      <div id="stepLog">
-        <div class="log-line">[ Sistem siap ] — Algoritma representasi parametrik dimuat.</div>
+      <div class="info-chip" id="chip-t">
+        <div class="chip-label">T / θ</div>
+        <div class="chip-val" id="valT">—</div>
       </div>
-
-      <!-- Panel analisis -->
-      <div id="analysisPanel">
-        <div class="analysis-title">📐 Analisis Kurva</div>
-        <div class="analysis-formula" id="formulaBox"></div>
-        <div class="props-grid" id="propsGrid"></div>
+      <div class="info-chip" id="chip-status">
+        <div class="chip-label">Status</div>
+        <div class="chip-val" id="statusText">Siap – pilih kurva dan tekan Proses</div>
       </div>
-
     </div>
-  </div>
 
-  <!-- Load JS: urutan wajib geometryCalc → canvasAnimator → ui → test -->
-  <script src="js/geometryCalc.js"></script>
-  <script src="js/canvasAnimator.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/test.js"></script>
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+      <canvas id="mainCanvas" width="760" height="500"></canvas>
+    </div>
+
+    <!-- Step Log -->
+    <div class="panel log-panel">
+      <div class="panel-title">Log Langkah Algoritma</div>
+      <div id="stepLog"></div>
+    </div>
+
+    <!-- Analysis Panel -->
+    <div id="analysisPanel">
+      <div class="analysis-title">▸ Analisis Kurva</div>
+      <pre class="analysis-formula" id="formulaBox"></pre>
+      <div class="props-grid" id="propsGrid"></div>
+    </div>
+
+  </div><!-- /right-col -->
+
+</div><!-- /dashboard -->
+
+<script src="js/geometryCalc.js"></script>
+<script src="js/canvasAnimator.js"></script>
+<script src="js/ui.js"></script>
+
+<script>
+  (function() {
+    var btn   = document.getElementById('themeToggle');
+    var icon  = document.getElementById('themeIcon');
+    var label = document.getElementById('themeLabel');
+    var body  = document.body;
+    var saved = localStorage.getItem('kurva-theme');
+    if (saved === 'light') {
+      body.classList.add('light');
+      icon.textContent  = '☀️';
+      label.textContent = 'Mode Terang';
+    }
+    btn.addEventListener('click', function() {
+      var isLight = body.classList.toggle('light');
+      icon.textContent  = isLight ? '☀️' : '🌙';
+      label.textContent = isLight ? 'Mode Terang' : 'Mode Gelap';
+      localStorage.setItem('kurva-theme', isLight ? 'light' : 'dark');
+    });
+  })();
+</script>
+
 </body>
 </html>
