@@ -31,9 +31,9 @@
 
   // ── FEEDBACK 1: DDA LINE DRAWING ──
   console.log('[1] DDA LINE DRAWING');
-  console.log('    Memastikan drawLineDDA tersedia dan tanpa threshold dist<40');
-  assert(typeof drawLineDDA === 'function', 'drawLineDDA() function exists');
-  assert(drawLineDDA.length === 6, 'drawLineDDA menerima 6 parameter (ctx, x0, y0, x1, y1, color, radius)');
+  console.log('    Memastikan drawLineBresenham tersedia dan tanpa threshold dist<40');
+  assert(typeof drawLineBresenham === 'function', 'drawLineBresenham() function exists');
+  assert(drawLineBresenham.length === 6, 'drawLineBresenham menerima 6 parameter (ctx, x0, y0, x1, y1, color, radius)');
 
   // ── FEEDBACK 2: 8-WAY SYMMETRY ──
   console.log('[2] 8-WAY SYMMETRY LINGKARAN');
