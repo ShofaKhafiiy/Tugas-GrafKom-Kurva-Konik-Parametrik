@@ -1,7 +1,4 @@
-/* ============================================================
-   style.css — Kurva Konik Parametrik  [UI v4 — CAD/Shader Tool]
-   Bukan SaaS dashboard. Ini tools grafika komputer.
-   ============================================================ */
+/* style.css v4 — updated 1782605561 */
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
@@ -278,7 +275,7 @@ body {
 .workspace {
   display: grid;
   grid-template-columns: 280px 1fr;
-  height: calc(100vh - 40px - 85px); /* viewport minus navbar minus hero */
+  height: calc(100vh - 40px - 85px - 36px); /* minus navbar, hero, statusbar */
   overflow: hidden;
 }
 
@@ -451,6 +448,8 @@ input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type='number'] { -moz-appearance: textfield; }
 input[type='number']:focus, select:focus { border-color: var(--border-focus); }
+/* nilai panjang seperti 6.28318... tetap muat */
+input[type='number'] { font-size: 0.72rem; }
 
 /* ── Controls ── */
 .ctrl-row {
@@ -561,57 +560,70 @@ input[type='range'] {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--canvas-bg);
+  background: var(--panel);  /* statusbar & bottombar ikut tema */
 }
 
-/* ── Status bar — di atas canvas, seperti IDE status bar ── */
+/* ── Status bar — di luar workspace, ikut light/dark ── */
 .statusbar {
   display: flex;
   align-items: center;
-  gap: 0;
-  height: 34px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  background: rgba(4,6,11,0.9);
-  flex-shrink: 0;
+  height: 36px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
   overflow: hidden;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .sb-chip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 14px;
+  gap: 7px;
+  padding: 0 16px;
   height: 100%;
-  border-right: 1px solid rgba(255,255,255,0.05);
+  border-right: 1px solid var(--border);
   flex-shrink: 0;
+  transition: border-color 0.2s;
 }
+
 .sb-chip-label {
   font-family: var(--mono);
   font-size: 0.58rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(100,116,139,0.7);
+  color: var(--text-2);
 }
+
 .sb-chip-val {
   font-family: var(--mono);
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.84rem;
+  font-weight: 700;
   line-height: 1;
+  min-width: 54px;
 }
-#chip-x-wrap  .sb-chip-val { color: var(--chip-x); }
-#chip-y-wrap  .sb-chip-val { color: var(--chip-y); }
-#chip-t-wrap  .sb-chip-val { color: var(--chip-t); }
+
+#chip-x-wrap .sb-chip-val { color: var(--chip-x); }
+#chip-y-wrap .sb-chip-val { color: var(--chip-y); }
+#chip-t-wrap .sb-chip-val { color: var(--chip-t); }
+
 #chip-st-wrap {
   flex: 1;
-  padding: 0 14px;
+  padding: 0 16px;
+  border-right: none;
 }
-#chip-st-wrap .sb-chip-val { color: var(--chip-s); font-size: 0.72rem; }
+#chip-st-wrap .sb-chip-val {
+  color: var(--chip-s);
+  font-size: 0.72rem;
+  font-weight: 600;
+  min-width: unset;
+}
 
-/* ── Canvas ── */
+/* ── Canvas — selalu dark background ── */
 .canvas-wrap {
   flex: 1;
   position: relative;
   overflow: hidden;
+  background: #04060b;
   display: flex;
   align-items: center;
   justify-content: center;

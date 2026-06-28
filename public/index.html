@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kurva Konik — Grafika Komputer</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=1782605948" />
 </head>
 <body>
 
@@ -44,6 +44,25 @@
       <span class="hero-meta-label" style="margin-left:11px;">Algo</span>
       <span class="hero-meta-val">Bresenham</span>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ STATUSBAR -->
+<div class="statusbar">
+  <div class="sb-chip" id="chip-x-wrap">
+    <span class="sb-chip-label">x</span>
+    <span class="sb-chip-val" id="valX">—</span>
+  </div>
+  <div class="sb-chip" id="chip-y-wrap">
+    <span class="sb-chip-label">y</span>
+    <span class="sb-chip-val" id="valY">—</span>
+  </div>
+  <div class="sb-chip" id="chip-t-wrap">
+    <span class="sb-chip-label">t/θ</span>
+    <span class="sb-chip-val" id="valT">—</span>
+  </div>
+  <div class="sb-chip" id="chip-st-wrap">
+    <span class="sb-chip-val" id="statusText">Pilih kurva → Render</span>
   </div>
 </div>
 
@@ -119,25 +138,6 @@
   <!-- ═══════════════════ MAIN AREA (canvas + bars) -->
   <div class="main-area">
 
-    <!-- Status bar — X Y T di atas canvas -->
-    <div class="statusbar">
-      <div class="sb-chip" id="chip-x-wrap">
-        <span class="sb-chip-label">x</span>
-        <span class="sb-chip-val" id="valX">—</span>
-      </div>
-      <div class="sb-chip" id="chip-y-wrap">
-        <span class="sb-chip-label">y</span>
-        <span class="sb-chip-val" id="valY">—</span>
-      </div>
-      <div class="sb-chip" id="chip-t-wrap">
-        <span class="sb-chip-label">t/θ</span>
-        <span class="sb-chip-val" id="valT">—</span>
-      </div>
-      <div class="sb-chip" id="chip-st-wrap">
-        <span class="sb-chip-val" id="statusText">Pilih kurva → Render</span>
-      </div>
-    </div>
-
     <!-- Canvas -->
     <div class="canvas-wrap">
       <canvas id="mainCanvas" width="760" height="480"></canvas>
@@ -176,6 +176,8 @@
     icon.textContent  = isLight ? '☀️' : '🌙';
     label.textContent = isLight ? 'Light' : 'Dark';
     localStorage.setItem('kurva-theme', isLight ? 'light' : 'dark');
+    // Redraw grid supaya warna canvas ikut tema
+    if (typeof drawGrid === 'function') drawGrid();
   });
 })();
 </script>
