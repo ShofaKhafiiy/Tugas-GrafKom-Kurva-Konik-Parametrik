@@ -129,12 +129,14 @@ function animateCurve(pointsArray, speedMs, onDone) {
   var startTime = Date.now();
   var prevPx = null, prevPy = null;
 
-  // Gradient kurva — sama di dark & light, kontras cukup di kedua mode
-  var grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0,    '#3b82f6');
-  grad.addColorStop(0.33, '#8b5cf6');
-  grad.addColorStop(0.66, '#ec4899');
-  grad.addColorStop(1,    '#10b981');
+  // Warna garis — cyan/teal
+  var lineGrad = ctx.createLinearGradient(0, 0, W, H);
+  lineGrad.addColorStop(0,    '#00d4ff');
+  lineGrad.addColorStop(0.5,  '#acb6b8');
+  lineGrad.addColorStop(1,    '#035c8b');
+
+  // Warna titik — putih di dark mode, hitam di light mode
+  var dotColor = isLightMode() ? '#1e293b' : '#ffffff';
 
   drawGrid();
 
@@ -158,14 +160,14 @@ function animateCurve(pointsArray, speedMs, onDone) {
     // Garis dulu
     if (prevPx !== null && AnimatorState.showLines) {
       ctx.globalAlpha = 0.9;
-      drawLineBresenham(ctx, prevPx, prevPy, px, py, grad, 1.5);
+      drawLineBresenham(ctx, prevPx, prevPy, px, py, lineGrad, 1.5);
       ctx.globalAlpha = 1;
     }
 
     // Titik
-    ctx.fillStyle = grad;
+    ctx.fillStyle = dotColor;
     ctx.beginPath();
-    ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+    ctx.arc(px, py, 2.8, 0, Math.PI * 2);
     ctx.fill();
 
     prevPx = px; prevPy = py;

@@ -317,7 +317,8 @@ body {
   font-family: var(--mono);
   font-size: 0.6rem;
   letter-spacing: 0.12em;
-  color: var(--text-2);
+  color: var(--text);
+  opacity: 0.6;
   text-transform: uppercase;
 }
 
@@ -386,7 +387,7 @@ body {
   cursor: pointer;
   font-family: var(--mono);
   font-size: 0.62rem;
-  color: var(--text-2);
+  color: var(--text);
   transition: all 0.12s;
   text-align: left;
   line-height: 1.3;
@@ -423,7 +424,8 @@ label.field-label {
   display: block;
   font-family: var(--mono);
   font-size: 0.58rem;
-  color: var(--text-2);
+  color: var(--text);
+  opacity: 0.65;
   margin-bottom: 3px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -435,6 +437,7 @@ input[type='number'], select {
   background: var(--input-bg);
   border: 1px solid var(--border);
   color: var(--text);
+  font-weight: 500;
   font-family: var(--mono);
   font-size: 0.76rem;
   border-radius: 4px;
@@ -623,15 +626,15 @@ input[type='range'] {
   flex: 1;
   position: relative;
   overflow: hidden;
-  background: #04060b;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 #mainCanvas {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* ── Bottom bar — log ── */
@@ -754,3 +757,23 @@ input[type='range'] {
   .hero h1 { font-size: 1.5rem; }
   .hero-meta { display: none; }
 }
+
+/* ── LIGHT MODE explicit overrides ── */
+body.light .preset-btn .pname { color: var(--accent); }
+body.light .preset-btn .pdesc { color: #475569; }
+body.light .preset-btn        { color: #1e293b; }
+body.light input[type='number'],
+body.light select              { color: #0f172a; background: #ffffff; }
+body.light label.field-label   { color: #334155; opacity: 1; }
+body.light .sb-title           { color: #334155; opacity: 1; }
+body.light .sb-badge           { background: rgba(37,99,235,0.1); color: #2563eb; }
+body.light .speed-val          { color: var(--accent); }
+body.light .ctrl-label,
+body.light .toggle-label,
+body.light .sb-chip-label      { color: #64748b; }
+body.light .nav-path           { color: #475569; }
+body.light .nav-path span      { color: #0f172a; }
+body.light .nav-tag            { color: #64748b; background: #f1f5f9; border-color: #e2e8f0; }
+body.light .bb-tab             { color: #64748b; }
+body.light .bb-tab.active      { color: var(--accent); }
+body.light #stepLog .log-line  { color: #64748b; }

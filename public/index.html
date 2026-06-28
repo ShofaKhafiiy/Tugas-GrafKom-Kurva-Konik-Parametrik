@@ -182,5 +182,28 @@
 })();
 </script>
 
+
+<script>
+// Resize canvas to fit container
+function resizeCanvas() {
+  var canvas = document.getElementById('mainCanvas');
+  var wrap   = canvas.parentElement;
+  var w = wrap.clientWidth;
+  var h = wrap.clientHeight;
+  if (w > 0 && h > 0) {
+    canvas.width  = w;
+    canvas.height = h;
+    if (AnimatorState.ctx) {
+      AnimatorState.W = w;
+      AnimatorState.H = h;
+      drawGrid();
+    }
+  }
+}
+window.addEventListener('load', function() {
+  setTimeout(resizeCanvas, 100);
+});
+window.addEventListener('resize', resizeCanvas);
+</script>
 </body>
 </html>
