@@ -141,6 +141,12 @@
     <!-- Canvas -->
     <div class="canvas-wrap">
       <canvas id="mainCanvas" width="760" height="480"></canvas>
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomIn" title="Perbesar">+</button>
+        <button class="zoom-btn" id="zoomOut" title="Perkecil">−</button>
+        <button class="zoom-btn" id="zoomReset" title="Reset">↺</button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+      </div>
     </div>
 
     <!-- Bottom bar — log -->
@@ -196,7 +202,11 @@ function resizeCanvas() {
     if (AnimatorState.ctx) {
       AnimatorState.W = w;
       AnimatorState.H = h;
-      drawGrid();
+      if (AnimatorState.lastPoints && AnimatorState.lastPoints.length > 0) {
+        animateCurve(AnimatorState.lastPoints, AnimatorState.lastSpeedMs);
+      } else {
+        drawGrid();
+      }
     }
   }
 }

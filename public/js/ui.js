@@ -460,6 +460,17 @@ document.addEventListener('DOMContentLoaded', function() {
     AnimatorState.showLines = this.checked;
   });
 
+  // Zoom buttons
+  document.getElementById('zoomIn').onclick = function() {
+    setZoom(AnimatorState.scale * 1.3);
+  };
+  document.getElementById('zoomOut').onclick = function() {
+    setZoom(AnimatorState.scale / 1.3);
+  };
+  document.getElementById('zoomReset').onclick = function() {
+    setZoom(1.0);
+  };
+
   // Live analisis saat parameter diubah
   document.getElementById('paramContainer').addEventListener('input', function() {
     updateAnalysis();

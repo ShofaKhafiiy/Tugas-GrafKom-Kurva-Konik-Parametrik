@@ -8,7 +8,10 @@ var AnimatorState = {
   W: 0,
   H: 0,
   animId: null,
-  showLines: true
+  showLines: true,
+  scale: 1.0,
+  lastPoints: null,
+  lastSpeedMs: 0
 };
 
 function initCanvas() {
@@ -16,17 +19,32 @@ function initCanvas() {
   AnimatorState.ctx    = AnimatorState.canvas.getContext('2d');
   AnimatorState.W      = AnimatorState.canvas.width;
   AnimatorState.H      = AnimatorState.canvas.height;
+  AnimatorState.canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    setZoom(AnimatorState.scale * (e.deltaY > 0 ? 0.9 : 1.1));
+  }, { passive: false });
 }
 
 function mapCoordinate(x, y) {
   var cx = AnimatorState.W / 2;
   var cy = AnimatorState.H / 2;
-  return { px: cx + x, py: cy - y };
+  var s  = AnimatorState.scale;
+  return { px: cx + x * s, py: cy - y * s };
 }
 
 // Deteksi apakah body punya class 'light'
 function isLightMode() {
   return document.body.classList.contains('light');
+}
+
+function getNiceStep(raw) {
+  if (raw <= 0) return 1;
+  var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  var residual = raw / mag;
+  if (residual <= 1.5) return 1 * mag;
+  if (residual <= 3.5) return 2 * mag;
+  if (residual <= 7.5) return 5 * mag;
+  return 10 * mag;
 }
 
 function drawGrid() {
@@ -35,69 +53,97 @@ function drawGrid() {
   var H     = AnimatorState.H;
   var cx    = W / 2;
   var cy    = H / 2;
+  var s     = AnimatorState.scale;
   var light = isLightMode();
 
-  // Background — dark mode gelap, light mode putih keabuan
   ctx.fillStyle = light ? '#f8fafc' : '#04060b';
   ctx.fillRect(0, 0, W, H);
 
-  var gridStep = 40;
+  // Adaptive step — world units
+  var labelStep = getNiceStep(80 / s);
+  var gridStep  = Math.max(labelStep / 5, labelStep / Math.ceil(labelStep * s / 5));
 
-  // Grid minor
+  // World boundaries visible on canvas
+  var minWX = -cx / s;
+  var maxWX = (W - cx) / s;
+  var minWY = -(H - cy) / s;
+  var maxWY = cy / s;
+
+  // Decimal places for labels
+  var decimals = 0;
+  if (labelStep < 1) {
+    decimals = Math.min(Math.ceil(-Math.log10(labelStep)), 6);
+  }
+
+  // ── Grid minor ──
   ctx.strokeStyle = light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.035)';
   ctx.lineWidth = 1;
-  for (var gx = cx % gridStep; gx < W; gx += gridStep) {
-    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+
+  var startGX = Math.ceil(minWX / gridStep) * gridStep;
+  for (var wx = startGX; wx <= maxWX; wx += gridStep) {
+    var px = cx + wx * s;
+    ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
   }
-  for (var gy = cy % gridStep; gy < H; gy += gridStep) {
-    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+  var startGY = Math.ceil(minWY / gridStep) * gridStep;
+  for (var wy = startGY; wy <= maxWY; wy += gridStep) {
+    var py = cy - wy * s;
+    ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke();
   }
 
-  // Sumbu X Y
+  // ── Sumbu X Y ──
   ctx.strokeStyle = light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.18)';
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
 
-  // Tick marks + label
-  var tickStep = 80;
+  // ── Tick marks + label ──
   ctx.font = '9px JetBrains Mono, monospace';
   ctx.fillStyle = light ? 'rgba(71,85,105,0.7)' : 'rgba(100,116,139,0.6)';
 
+  // X-axis
   ctx.textAlign = 'center';
-  for (var tx = cx + tickStep; tx < W - 10; tx += tickStep) {
+  var startLX = Math.ceil(minWX / labelStep) * labelStep;
+  for (var wx = startLX; wx <= maxWX; wx += labelStep) {
+    if (Math.abs(wx) < 1e-9) continue;
+    var px = cx + wx * s;
+    if (px < 0 || px > W) continue;
     ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(tx, cy-3); ctx.lineTo(tx, cy+3); ctx.stroke();
-    ctx.fillText(Math.round(tx - cx), tx, cy + 13);
-  }
-  for (var tx2 = cx - tickStep; tx2 > 10; tx2 -= tickStep) {
-    ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(tx2, cy-3); ctx.lineTo(tx2, cy+3); ctx.stroke();
-    ctx.fillText(Math.round(tx2 - cx), tx2, cy + 13);
-  }
-  ctx.textAlign = 'right';
-  for (var ty = cy - tickStep; ty > 10; ty -= tickStep) {
-    ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(cx-3, ty); ctx.lineTo(cx+3, ty); ctx.stroke();
-    ctx.fillText(Math.round(cy - ty), cx - 5, ty + 3);
-  }
-  for (var ty2 = cy + tickStep; ty2 < H - 10; ty2 += tickStep) {
-    ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(cx-3, ty2); ctx.lineTo(cx+3, ty2); ctx.stroke();
-    ctx.fillText(Math.round(cy - ty2), cx - 5, ty2 + 3);
+    ctx.beginPath(); ctx.moveTo(px, cy - 3); ctx.lineTo(px, cy + 3); ctx.stroke();
+    ctx.fillText(wx.toFixed(decimals), px, cy + 13);
   }
 
-  // Label sumbu
+  // Y-axis
+  ctx.textAlign = 'right';
+  var startLY = Math.ceil(minWY / labelStep) * labelStep;
+  for (var wy = startLY; wy <= maxWY; wy += labelStep) {
+    if (Math.abs(wy) < 1e-9) continue;
+    var py = cy - wy * s;
+    if (py < 0 || py > H) continue;
+    ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx - 3, py); ctx.lineTo(cx + 3, py); ctx.stroke();
+    ctx.fillText(wy.toFixed(decimals), cx - 5, py + 3);
+  }
+
+  // Label sumbu + origin
   ctx.fillStyle = light ? 'rgba(37,99,235,0.6)' : 'rgba(96,130,200,0.5)';
   ctx.font = '10px JetBrains Mono, monospace';
   ctx.textAlign = 'left';
   ctx.fillText('X', W - 13, cy - 6);
   ctx.fillText('Y', cx + 6, 12);
   ctx.fillText('0', cx + 4, cy + 12);
+}
+
+function setZoom(newScale) {
+  AnimatorState.scale = Math.max(0.1, Math.min(50, newScale));
+  var el = document.getElementById('zoomLevel');
+  if (el) el.textContent = Math.round(AnimatorState.scale * 100) + '%';
+  if (AnimatorState.lastPoints && AnimatorState.lastPoints.length > 0) {
+    animateCurve(AnimatorState.lastPoints, AnimatorState.lastSpeedMs);
+  } else {
+    drawGrid();
+  }
 }
 
 function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {
@@ -120,6 +166,9 @@ function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {
 
 function animateCurve(pointsArray, speedMs, onDone) {
   if (AnimatorState.animId) cancelAnimationFrame(AnimatorState.animId);
+
+  AnimatorState.lastPoints = pointsArray;
+  AnimatorState.lastSpeedMs = speedMs || 0;
 
   var ctx   = AnimatorState.ctx;
   var W     = AnimatorState.W;
