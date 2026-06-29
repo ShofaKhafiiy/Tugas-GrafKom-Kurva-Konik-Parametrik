@@ -1,9 +1,5 @@
-// US 2.1 — ANIMASI RENDER DI CANVAS
-
-// US 2.2 — LIVE TRACKING + POST /api/save-curve
 // ============================================================
-// Rendering & animasi step-by-step ke HTML Canvas
-// Depends on: DOM element #mainCanvas
+// canvasAnimator.js  [v4 — theme-aware grid]
 // ============================================================
 
 var AnimatorState = {
@@ -12,161 +8,154 @@ var AnimatorState = {
   W: 0,
   H: 0,
   animId: null,
-  showLines: true
+  showLines: true,
+  scale: 1.0,
+  lastPoints: null,
+  lastSpeedMs: 0
 };
 
-// ------------------------------------------------------------
-// Init – panggil sekali setelah DOM siap
-// ------------------------------------------------------------
 function initCanvas() {
   AnimatorState.canvas = document.getElementById('mainCanvas');
   AnimatorState.ctx    = AnimatorState.canvas.getContext('2d');
   AnimatorState.W      = AnimatorState.canvas.width;
   AnimatorState.H      = AnimatorState.canvas.height;
+  AnimatorState.canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    setZoom(AnimatorState.scale * (e.deltaY > 0 ? 0.9 : 1.1));
+  }, { passive: false });
 }
 
-// ------------------------------------------------------------
-// mapCoordinate
-// Konversi koordinat matematis (x, y) → piksel layar (px, py)
-// Pusat kanvas = origin (0,0)
-// Sumbu Y dibalik: matematis naik = layar naik (bukan turun)
-// ------------------------------------------------------------
 function mapCoordinate(x, y) {
   var cx = AnimatorState.W / 2;
   var cy = AnimatorState.H / 2;
-  return {
-    px: cx + x,
-    py: cy - y    // balik Y
-  };
+  var s  = AnimatorState.scale;
+  return { px: cx + x * s, py: cy - y * s };
 }
 
-// ------------------------------------------------------------
-// drawGrid
-// Background gelap + grid spasi 40px + sumbu X/Y tebal
-// Tick marks setiap 80px dengan label angka
-// ------------------------------------------------------------
-function drawGrid() {
-  var ctx = AnimatorState.ctx;
-  var W   = AnimatorState.W;
-  var H   = AnimatorState.H;
-  var cx  = W / 2;
-  var cy  = H / 2;
+// Deteksi apakah body punya class 'light'
+function isLightMode() {
+  return document.body.classList.contains('light');
+}
 
-  // Background
-  ctx.fillStyle = '#030508';
+function getNiceStep(raw) {
+  if (raw <= 0) return 1;
+  var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  var residual = raw / mag;
+  if (residual <= 1.5) return 1 * mag;
+  if (residual <= 3.5) return 2 * mag;
+  if (residual <= 7.5) return 5 * mag;
+  return 10 * mag;
+}
+
+function drawGrid() {
+  var ctx   = AnimatorState.ctx;
+  var W     = AnimatorState.W;
+  var H     = AnimatorState.H;
+  var cx    = W / 2;
+  var cy    = H / 2;
+  var s     = AnimatorState.scale;
+  var light = isLightMode();
+
+  ctx.fillStyle = light ? '#f8fafc' : '#04060b';
   ctx.fillRect(0, 0, W, H);
 
-  var gridStep = 40;
+  // Adaptive step — world units
+  var labelStep = getNiceStep(80 / s);
+  var gridStep  = Math.max(labelStep / 5, labelStep / Math.ceil(labelStep * s / 5));
 
-  // Grid minor
-  ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+  // World boundaries visible on canvas
+  var minWX = -cx / s;
+  var maxWX = (W - cx) / s;
+  var minWY = -(H - cy) / s;
+  var maxWY = cy / s;
+
+  // Decimal places for labels
+  var decimals = 0;
+  if (labelStep < 1) {
+    decimals = Math.min(Math.ceil(-Math.log10(labelStep)), 6);
+  }
+
+  // ── Grid minor ──
+  ctx.strokeStyle = light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.035)';
   ctx.lineWidth = 1;
-  for (var gx = cx % gridStep; gx < W; gx += gridStep) {
-    ctx.beginPath();
-    ctx.moveTo(gx, 0);
-    ctx.lineTo(gx, H);
-    ctx.stroke();
+
+  var startGX = Math.ceil(minWX / gridStep) * gridStep;
+  for (var wx = startGX; wx <= maxWX; wx += gridStep) {
+    var px = cx + wx * s;
+    ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
   }
-  for (var gy = cy % gridStep; gy < H; gy += gridStep) {
-    ctx.beginPath();
-    ctx.moveTo(0, gy);
-    ctx.lineTo(W, gy);
-    ctx.stroke();
+  var startGY = Math.ceil(minWY / gridStep) * gridStep;
+  for (var wy = startGY; wy <= maxWY; wy += gridStep) {
+    var py = cy - wy * s;
+    ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke();
   }
 
-  // Sumbu X
-  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(0, cy);
-  ctx.lineTo(W, cy);
-  ctx.stroke();
+  // ── Sumbu X Y ──
+  ctx.strokeStyle = light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
 
-  // Sumbu Y
-  ctx.beginPath();
-  ctx.moveTo(cx, 0);
-  ctx.lineTo(cx, H);
-  ctx.stroke();
+  // ── Tick marks + label ──
+  ctx.font = '9px JetBrains Mono, monospace';
+  ctx.fillStyle = light ? 'rgba(71,85,105,0.7)' : 'rgba(100,116,139,0.6)';
 
-  // Tick marks + angka
-  var tickStep = 80;
-  ctx.font = '10px JetBrains Mono, monospace';
-  ctx.fillStyle = 'rgba(122,132,154,0.75)';
-
-  // Tick X positif
+  // X-axis
   ctx.textAlign = 'center';
-  for (var tx = cx + tickStep; tx < W - 10; tx += tickStep) {
-    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+  var startLX = Math.ceil(minWX / labelStep) * labelStep;
+  for (var wx = startLX; wx <= maxWX; wx += labelStep) {
+    if (Math.abs(wx) < 1e-9) continue;
+    var px = cx + wx * s;
+    if (px < 0 || px > W) continue;
+    ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(tx, cy - 4);
-    ctx.lineTo(tx, cy + 4);
-    ctx.stroke();
-    ctx.fillText(Math.round(tx - cx), tx, cy + 14);
+    ctx.beginPath(); ctx.moveTo(px, cy - 3); ctx.lineTo(px, cy + 3); ctx.stroke();
+    ctx.fillText(wx.toFixed(decimals), px, cy + 13);
   }
 
-  // Tick X negatif
-  for (var tx2 = cx - tickStep; tx2 > 10; tx2 -= tickStep) {
-    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(tx2, cy - 4);
-    ctx.lineTo(tx2, cy + 4);
-    ctx.stroke();
-    ctx.fillText(Math.round(tx2 - cx), tx2, cy + 14);
-  }
-
-  // Tick Y positif (atas)
+  // Y-axis
   ctx.textAlign = 'right';
-  for (var ty = cy - tickStep; ty > 10; ty -= tickStep) {
-    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+  var startLY = Math.ceil(minWY / labelStep) * labelStep;
+  for (var wy = startLY; wy <= maxWY; wy += labelStep) {
+    if (Math.abs(wy) < 1e-9) continue;
+    var py = cy - wy * s;
+    if (py < 0 || py > H) continue;
+    ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx - 4, ty);
-    ctx.lineTo(cx + 4, ty);
-    ctx.stroke();
-    ctx.fillText(Math.round(cy - ty), cx - 7, ty + 4);
+    ctx.beginPath(); ctx.moveTo(cx - 3, py); ctx.lineTo(cx + 3, py); ctx.stroke();
+    ctx.fillText(wy.toFixed(decimals), cx - 5, py + 3);
   }
 
-  // Tick Y negatif (bawah)
-  for (var ty2 = cy + tickStep; ty2 < H - 10; ty2 += tickStep) {
-    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx - 4, ty2);
-    ctx.lineTo(cx + 4, ty2);
-    ctx.stroke();
-    ctx.fillText(Math.round(cy - ty2), cx - 7, ty2 + 4);
-  }
-
-  // Label sumbu
-  ctx.fillStyle = 'rgba(91,143,255,0.65)';
-  ctx.font = '11px Inter, sans-serif';
+  // Label sumbu + origin
+  ctx.fillStyle = light ? 'rgba(37,99,235,0.6)' : 'rgba(96,130,200,0.5)';
+  ctx.font = '10px JetBrains Mono, monospace';
   ctx.textAlign = 'left';
-  ctx.fillText('X', W - 14, cy - 8);
-  ctx.fillText('Y', cx + 8,  14);
-  ctx.fillText('0', cx + 5,  cy + 14);
+  ctx.fillText('X', W - 13, cy - 6);
+  ctx.fillText('Y', cx + 6, 12);
+  ctx.fillText('0', cx + 4, cy + 12);
 }
 
-// ------------------------------------------------------------
-// drawLineBresenham — Algoritma Bresenham
-// Menghasilkan titik-titik antara (x0,y0) dan (x1,y1)
-// Menggunakan integer arithmetic — tanpa floating point
-// ------------------------------------------------------------
+function setZoom(newScale) {
+  AnimatorState.scale = Math.max(0.1, Math.min(50, newScale));
+  var el = document.getElementById('zoomLevel');
+  if (el) el.textContent = Math.round(AnimatorState.scale * 100) + '%';
+  if (AnimatorState.lastPoints && AnimatorState.lastPoints.length > 0) {
+    animateCurve(AnimatorState.lastPoints, AnimatorState.lastSpeedMs);
+  } else {
+    drawGrid();
+  }
+}
+
 function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {
-  var ix = Math.round(x0);
-  var iy = Math.round(y0);
-  var ex = Math.round(x1);
-  var ey = Math.round(y1);
-  var dx = Math.abs(ex - ix);
-  var dy = -Math.abs(ey - iy);
-  var sx = ix < ex ? 1 : -1;
-  var sy = iy < ey ? 1 : -1;
+  var ix = Math.round(x0), iy = Math.round(y0);
+  var ex = Math.round(x1), ey = Math.round(y1);
+  var dx = Math.abs(ex - ix), dy = -Math.abs(ey - iy);
+  var sx = ix < ex ? 1 : -1, sy = iy < ey ? 1 : -1;
   var err = dx + dy;
   ctx.fillStyle = color;
   while (true) {
     ctx.beginPath();
-    ctx.arc(ix, iy, radius || 1.5, 0, Math.PI * 2);
+    ctx.arc(ix, iy, radius || 1, 0, Math.PI * 2);
     ctx.fill();
     if (ix === ex && iy === ey) break;
     var e2 = 2 * err;
@@ -175,17 +164,11 @@ function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {
   }
 }
 
-// ------------------------------------------------------------
-// animateCurve
-// Render titik satu per satu dengan animasi requestAnimationFrame
-// pointsArray : array { x, y, t } dari geometryCalc
-// speedMs     : delay milidetik antar frame (0 = secepat mungkin)
-// onDone      : callback setelah selesai (optional)
-// ------------------------------------------------------------
 function animateCurve(pointsArray, speedMs, onDone) {
-  if (AnimatorState.animId) {
-    cancelAnimationFrame(AnimatorState.animId);
-  }
+  if (AnimatorState.animId) cancelAnimationFrame(AnimatorState.animId);
+
+  AnimatorState.lastPoints = pointsArray;
+  AnimatorState.lastSpeedMs = speedMs || 0;
 
   var ctx   = AnimatorState.ctx;
   var W     = AnimatorState.W;
@@ -193,15 +176,16 @@ function animateCurve(pointsArray, speedMs, onDone) {
   var total = pointsArray.length;
   var i     = 0;
   var startTime = Date.now();
-  var prevPx = null;
-  var prevPy = null;
+  var prevPx = null, prevPy = null;
 
-  // Gradient warna kurva (ungu → pink → kuning → cyan)
-  var grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0,    '#5B8FFF');
-  grad.addColorStop(0.35, '#FF6B9D');
-  grad.addColorStop(0.70, '#ffd166');
-  grad.addColorStop(1,    '#00D4AA');
+  // Warna garis — cyan/teal
+  var lineGrad = ctx.createLinearGradient(0, 0, W, H);
+  lineGrad.addColorStop(0,    '#00d4ff');
+  lineGrad.addColorStop(0.5,  '#acb6b8');
+  lineGrad.addColorStop(1,    '#035c8b');
+
+  // Warna titik — putih di dark mode, hitam di light mode
+  var dotColor = isLightMode() ? '#1e293b' : '#ffffff';
 
   drawGrid();
 
@@ -209,9 +193,8 @@ function animateCurve(pointsArray, speedMs, onDone) {
     if (i >= total) {
       var elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
       document.getElementById('statusText').textContent =
-        '✓ Selesai! ' + elapsed + ' dtk, ' + total + ' titik';
+        '✓ Selesai — ' + elapsed + 's · ' + total + ' titik';
       document.getElementById('processBtn').disabled = false;
-
       if (onDone) onDone(elapsed, total);
       return;
     }
@@ -221,48 +204,33 @@ function animateCurve(pointsArray, speedMs, onDone) {
     var px     = mapped.px;
     var py     = mapped.py;
 
-    // Angkat pulpen jika titik ini memulai cabang baru (hiperbola)
-    if (pt.newBranch) {
-      prevPx = null;
-      prevPy = null;
-    }
+    if (pt.newBranch) { prevPx = null; prevPy = null; }
 
-    // Titik dengan shadow glow
-    ctx.save();
-    ctx.shadowColor = '#5B8FFF';
-    ctx.shadowBlur  = 7;
-    ctx.fillStyle   = grad;
-    ctx.beginPath();
-    ctx.arc(px, py, 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // Garis penghubung Bresenham — selalu gambar antar titik berurutan
+    // Garis dulu
     if (prevPx !== null && AnimatorState.showLines) {
-      ctx.save();
-      ctx.shadowColor = '#5B8FFF';
-      ctx.shadowBlur  = 4;
-      ctx.globalAlpha = 0.7;
-      drawLineBresenham(ctx, prevPx, prevPy, px, py, grad, 1.5);
-      ctx.restore();
+      ctx.globalAlpha = 0.9;
+      drawLineBresenham(ctx, prevPx, prevPy, px, py, lineGrad, 1.5);
+      ctx.globalAlpha = 1;
     }
 
-    prevPx = px;
-    prevPy = py;
+    // Titik
+    ctx.fillStyle = dotColor;
+    ctx.beginPath();
+    ctx.arc(px, py, 2.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    prevPx = px; prevPy = py;
     i++;
 
-    // Update DOM live
     document.getElementById('valX').textContent = pt.x.toFixed(2);
     document.getElementById('valY').textContent = pt.y.toFixed(2);
     document.getElementById('valT').textContent = pt.t.toFixed(3);
-    var branchInfo = pt.branch ? ' | Cabang: ' + pt.branch : '';
+    var branchInfo = pt.branch ? ' · Cabang ' + pt.branch : '';
     document.getElementById('statusText').textContent =
-      'Merender... ' + i + ' dari ' + total + branchInfo;
+      'Rendering ' + i + ' / ' + total + branchInfo;
 
     if (speedMs > 0) {
-      setTimeout(function() {
-        AnimatorState.animId = requestAnimationFrame(step);
-      }, speedMs);
+      setTimeout(function() { AnimatorState.animId = requestAnimationFrame(step); }, speedMs);
     } else {
       AnimatorState.animId = requestAnimationFrame(step);
     }
@@ -270,4 +238,3 @@ function animateCurve(pointsArray, speedMs, onDone) {
 
   step();
 }
-

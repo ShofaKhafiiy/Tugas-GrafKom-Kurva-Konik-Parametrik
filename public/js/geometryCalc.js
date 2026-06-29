@@ -134,9 +134,10 @@ function calculateParabola(xc, yc, a, delta, tMin, tMax, orientation, maxExtent)
   var adjMax = Math.min(tMax, r.tMax);
   var steps = Math.round((adjMax - adjMin) / delta);
   if (steps < 1) steps = 1;
+  // Pastikan steps genap agar t=0 selalu menjadi titik tengah perulangan
+  if (steps % 2 !== 0) steps++;
+  var mid = steps / 2;
   for (var i = 0; i <= steps; i++) {
-    // Power-law: spread titik lebih merata (konsentrasi di ujung)
-    // agar gradien parabola yang curam di |t| besar terkompensasi
     var u = i / steps;
     var v = 2 * u - 1;
     var biased = (v >= 0 ? 1 : -1) * Math.pow(Math.abs(v), 0.55);

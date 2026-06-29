@@ -216,7 +216,7 @@ function getFormValues(defs) {
     if (!el) continue;
     vals[defs[i].id] = (defs[i].type === 'select')
       ? el.value
-      : parseFloat(el.value);
+      : parseFloat(el.value.replace(',', '.'));
   }
   return vals;
 }
@@ -459,6 +459,17 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('lineToggle').addEventListener('change', function() {
     AnimatorState.showLines = this.checked;
   });
+
+  // Zoom buttons
+  document.getElementById('zoomIn').onclick = function() {
+    setZoom(AnimatorState.scale * 1.3);
+  };
+  document.getElementById('zoomOut').onclick = function() {
+    setZoom(AnimatorState.scale / 1.3);
+  };
+  document.getElementById('zoomReset').onclick = function() {
+    setZoom(1.0);
+  };
 
   // Live analisis saat parameter diubah
   document.getElementById('paramContainer').addEventListener('input', function() {
