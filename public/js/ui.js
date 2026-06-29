@@ -216,7 +216,7 @@ function getFormValues(defs) {
     if (!el) continue;
     vals[defs[i].id] = (defs[i].type === 'select')
       ? el.value
-      : parseFloat(el.value);
+      : parseFloat(el.value.replace(',', '.'));
   }
   return vals;
 }
