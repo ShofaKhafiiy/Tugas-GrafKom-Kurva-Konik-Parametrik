@@ -458,7 +458,21 @@ function renderDataTable(points, curveType) {
 // ------------------------------------------------------------
 function zoomToTablePoint(index) {
   if (lastCurvePoints && lastCurvePoints[index]) {
+    highlightTableRow(index);
     zoomToPoint(lastCurvePoints[index]);
+  }
+}
+
+// ------------------------------------------------------------
+// highlightTableRow — sorot baris tabel + scroll ke baris tsb
+// ------------------------------------------------------------
+function highlightTableRow(index) {
+  var prev = document.querySelector('#dataTableContainer tr.highlighted');
+  if (prev) prev.classList.remove('highlighted');
+  var rows = document.querySelectorAll('#dataTableContainer tbody tr');
+  if (rows && rows[index]) {
+    rows[index].classList.add('highlighted');
+    rows[index].scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 }
 
