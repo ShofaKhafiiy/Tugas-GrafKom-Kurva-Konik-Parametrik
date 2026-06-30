@@ -149,12 +149,15 @@
       </div>
     </div>
 
-    <!-- Bottom bar — log -->
+    <!-- Bottom bar — log & data -->
     <div class="bottombar">
+      <div class="bb-resize-handle"></div>
       <div class="bb-tabs">
-        <div class="bb-tab active">Output Log</div>
+        <div class="bb-tab active" data-tab="log">Output Log</div>
+        <div class="bb-tab" data-tab="data">Tabel Data</div>
       </div>
       <div id="stepLog"></div>
+      <div id="dataTableContainer" style="display:none;"></div>
     </div>
 
   </div><!-- /main-area -->
@@ -203,7 +206,7 @@ function resizeCanvas() {
       AnimatorState.W = w;
       AnimatorState.H = h;
       if (AnimatorState.lastPoints && AnimatorState.lastPoints.length > 0) {
-        animateCurve(AnimatorState.lastPoints, AnimatorState.lastSpeedMs);
+        redrawCanvas();
       } else {
         drawGrid();
       }
