@@ -48,6 +48,12 @@ function calculateCircle(xc, yc, r, delta, tMin, tMax) {
       }
     }
     points.sort(function(a, b) { return a.t - b.t; });
+    var deduped = [];
+    for (var k = 0; k < points.length; k++) {
+      if (k > 0 && Math.abs(points[k].t - points[k - 1].t) < 1e-12) continue;
+      deduped.push(points[k]);
+    }
+    points = deduped;
   } else {
     var steps = Math.round(range / delta);
     if (steps < 1) steps = 1;
@@ -90,6 +96,12 @@ function calculateEllipse(xc, yc, a, b, delta, tMin, tMax) {
       points.push({ x: xc + rx, y: yc - ry, t: 2 * Math.PI - theta });
     }
     points.sort(function(a, b) { return a.t - b.t; });
+    var deduped = [];
+    for (var k = 0; k < points.length; k++) {
+      if (k > 0 && Math.abs(points[k].t - points[k - 1].t) < 1e-12) continue;
+      deduped.push(points[k]);
+    }
+    points = deduped;
   } else {
     var steps = Math.round(range / delta);
     if (steps < 1) steps = 1;
@@ -134,14 +146,8 @@ function calculateParabola(xc, yc, a, delta, tMin, tMax, orientation, maxExtent)
   var adjMax = Math.min(tMax, r.tMax);
   var steps = Math.round((adjMax - adjMin) / delta);
   if (steps < 1) steps = 1;
-  // Pastikan steps genap agar t=0 selalu menjadi titik tengah perulangan
-  if (steps % 2 !== 0) steps++;
-  var mid = steps / 2;
   for (var i = 0; i <= steps; i++) {
-    var u = i / steps;
-    var v = 2 * u - 1;
-    var biased = (v >= 0 ? 1 : -1) * Math.pow(Math.abs(v), 0.55);
-    var t = (adjMin + adjMax) / 2 + ((adjMax - adjMin) / 2) * biased;
+    var t = adjMin + (adjMax - adjMin) * i / steps;
     var x, y;
     if (orientation === 'right') {
       x = xc + a * t * t;

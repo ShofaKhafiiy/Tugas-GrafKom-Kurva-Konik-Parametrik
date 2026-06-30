@@ -18,7 +18,10 @@ var AnimatorState = {
   dragStartX: 0,
   dragStartY: 0,
   offsetStartX: 0,
-  offsetStartY: 0
+  offsetStartY: 0,
+  highlightPoint: null,
+  highlightTimer: null,
+  hoverPoint: null
 };
 
 function initCanvas() {
@@ -61,6 +64,27 @@ function initCanvas() {
     AnimatorState.isDragging = false;
     AnimatorState.canvas.style.cursor = 'grab';
   });
+
+  AnimatorState.canvas.addEventListener('mousemove', function(e) {
+    if (AnimatorState.isDragging) return;
+    var rect = AnimatorState.canvas.getBoundingClientRect();
+    var mx = (e.clientX - rect.left) * (AnimatorState.canvas.width / rect.width);
+    var my = (e.clientY - rect.top) * (AnimatorState.canvas.height / rect.height);
+    var nearest = findNearestPoint(mx, my, 10);
+    if (nearest) {
+      AnimatorState.hoverPoint = nearest;
+    } else if (AnimatorState.hoverPoint) {
+      AnimatorState.hoverPoint = null;
+    }
+    redrawCanvas();
+  });
+
+  AnimatorState.canvas.addEventListener('mouseleave', function() {
+    if (AnimatorState.hoverPoint) {
+      AnimatorState.hoverPoint = null;
+      redrawCanvas();
+    }
+  });
 }
 
 function mapCoordinate(x, y) {
@@ -68,6 +92,24 @@ function mapCoordinate(x, y) {
   var cy = AnimatorState.H / 2;
   var s  = AnimatorState.scale;
   return { px: cx + x * s + AnimatorState.offsetX, py: cy - y * s + AnimatorState.offsetY };
+}
+
+function findNearestPoint(cx, cy, threshold) {
+  if (!AnimatorState.lastPoints) return null;
+  var best = null;
+  var bestDist = threshold;
+  for (var i = 0; i < AnimatorState.lastPoints.length; i++) {
+    var pt = AnimatorState.lastPoints[i];
+    var m = mapCoordinate(pt.x, pt.y);
+    var dx = m.px - cx;
+    var dy = m.py - cy;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = { point: pt, px: m.px, py: m.py };
+    }
+  }
+  return best;
 }
 
 // Deteksi apakah body punya class 'light'
@@ -212,6 +254,73 @@ function redrawCanvas() {
 
     prevPx = px; prevPy = py;
   }
+
+  if (AnimatorState.highlightPoint) {
+    var hp = AnimatorState.highlightPoint;
+    var hm = mapCoordinate(hp.x, hp.y);
+    var grad = ctx.createRadialGradient(hm.px, hm.py, 0, hm.px, hm.py, 22);
+    grad.addColorStop(0, 'rgba(59,130,246,0.5)');
+    grad.addColorStop(1, 'rgba(59,130,246,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(hm.px, hm.py, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#3B82F6';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(hm.px, hm.py, 9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#3B82F6';
+    ctx.beginPath();
+    ctx.arc(hm.px, hm.py, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  if (AnimatorState.hoverPoint) {
+    var hp = AnimatorState.hoverPoint.point;
+    var hm = mapCoordinate(hp.x, hp.y);
+    var cx = AnimatorState.W / 2;
+    var cy = AnimatorState.H / 2;
+    var ox = AnimatorState.offsetX;
+    var oy = AnimatorState.offsetY;
+    var axisX = cy + oy;
+    var axisY = cx + ox;
+    var light = isLightMode();
+
+    ctx.save();
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = light ? 'rgba(100,116,139,0.45)' : 'rgba(148,163,184,0.35)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(hm.px, hm.py);
+    ctx.lineTo(hm.px, axisX);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hm.px, hm.py);
+    ctx.lineTo(axisY, hm.py);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+    ctx.fillStyle = light ? '#0f172a' : '#e2e8f0';
+    ctx.font = '11px JetBrains Mono, monospace';
+    var label = '(' + hp.x.toFixed(2) + ', ' + hp.y.toFixed(2) + ')';
+    var tw = ctx.measureText(label).width;
+    var pad = 5;
+    var bx = hm.px + 14;
+    var by = hm.py - 14;
+    if (bx + tw + pad * 2 > AnimatorState.W) bx = hm.px - tw - pad * 2 - 6;
+    if (by - 8 < 0) by = hm.py + 22;
+    ctx.fillStyle = light ? '#ffffff' : '#0d1117';
+    ctx.strokeStyle = light ? '#c4cfe0' : '#1e2535';
+    ctx.lineWidth = 1;
+    ctx.fillRect(bx - pad, by - 8 - pad, tw + pad * 2, 16 + pad * 2);
+    ctx.strokeRect(bx - pad, by - 8 - pad, tw + pad * 2, 16 + pad * 2);
+    ctx.fillStyle = light ? '#0f172a' : '#e2e8f0';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, bx, by);
+    ctx.restore();
+  }
 }
 
 function setZoom(newScale) {
@@ -229,6 +338,26 @@ function resetView() {
   AnimatorState.offsetX = 0;
   AnimatorState.offsetY = 0;
   setZoom(1.0);
+}
+
+function zoomToPoint(pt) {
+  if (AnimatorState.highlightTimer) {
+    clearTimeout(AnimatorState.highlightTimer);
+    AnimatorState.highlightTimer = null;
+  }
+  var s = 4;
+  AnimatorState.scale = s;
+  AnimatorState.offsetX = -(pt.x * s);
+  AnimatorState.offsetY = pt.y * s;
+  var el = document.getElementById('zoomLevel');
+  if (el) el.textContent = Math.round(AnimatorState.scale * 100) + '%';
+  AnimatorState.highlightPoint = { x: pt.x, y: pt.y };
+  redrawCanvas();
+  AnimatorState.highlightTimer = setTimeout(function() {
+    AnimatorState.highlightPoint = null;
+    AnimatorState.highlightTimer = null;
+    redrawCanvas();
+  }, 3000);
 }
 
 function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {

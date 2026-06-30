@@ -447,7 +447,7 @@ function renderDataTable(points, curveType) {
 
   for (var i = 0; i < points.length; i++) {
     var pt = points[i];
-    html += '<tr>';
+    html += '<tr onclick="zoomToTablePoint(' + i + ')" style="cursor:pointer;">';
     html += '<td>' + (i + 1) + '</td>';
     html += '<td>' + pt.t.toFixed(4) + '</td>';
     html += '<td>' + pt.x.toFixed(4) + '</td>';
@@ -457,6 +457,15 @@ function renderDataTable(points, curveType) {
 
   html += '</tbody></table>';
   con.innerHTML = html;
+}
+
+// ------------------------------------------------------------
+// zoomToTablePoint — zoom canvas ke titik dari klik baris tabel
+// ------------------------------------------------------------
+function zoomToTablePoint(index) {
+  if (lastCurvePoints && lastCurvePoints[index]) {
+    zoomToPoint(lastCurvePoints[index]);
+  }
 }
 
 // ------------------------------------------------------------
