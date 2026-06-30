@@ -33,7 +33,9 @@ function initCanvas() {
 
   AnimatorState.canvas.addEventListener('wheel', function(e) {
     e.preventDefault();
-    setZoom(AnimatorState.scale * (e.deltaY > 0 ? 0.9 : 1.1));
+    var amount = Math.abs(e.deltaY) * 0.0005;
+    amount = Math.min(amount, 0.08);
+    setZoom(AnimatorState.scale * (e.deltaY > 0 ? (1 - amount) : (1 + amount)));
   }, { passive: false });
 
   AnimatorState.canvas.addEventListener('mousedown', function(e) {
