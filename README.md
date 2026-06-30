@@ -289,23 +289,6 @@ Menyimpan data kurva ke server (array in-memory).
 
 **Response**: `{ status: "ok", total: <jumlah_kurva_tersimpan> }`
 
----
-
-## User Stories
-
-Project ini dikerjakan oleh 4 anggota tim dengan pembagian tugas sebagai berikut:
-
-| US | Branch | Tugas | PIC |
-|----|--------|-------|-----|
-| **US 1.1** | `US-1.1-milih-bentuk` | Milih Bentuk Geometri — UI pemilihan kurva, form parameter dinamis | Anggota 1 |
-| **US 1.2** | `US-1.2-manipulasi-param` | Manipulasi Parameter & Kalkulasi — 4 fungsi kalkulasi parametrik, validasi | Anggota 2 |
-| **US 2.1** | `US-2.1-visualisasi-proses` | Visualisasi Proses Render — canvas, grid, animasi titik-per-titik | Anggota 3 |
-| **US 2.2** | `US-2.2-bentuk-akhir` | Visualisasi Bentuk Akhir & Live Tracking — info bar, analysis panel, server | Anggota 4 |
-
-Urutan merge wajib: `main → US-1.1 → US-1.2 → US-2.1 → US-2.2 → main`
-
----
-
 ## Lisensi
 
 Project ini dibuat untuk keperluan tugas mata kuliah **Grafika Komputer — Semester 4**.
