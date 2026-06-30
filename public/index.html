@@ -22,7 +22,7 @@
     <span class="nav-tag">Bresenham + DDA</span>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle tema">
       <span class="theme-icon" id="themeIcon">🌙</span>
-      <span class="theme-label" id="themeLabel">Dark</span>
+      <span class="theme-label" id="themeLabel">Gelap</span>
     </button>
   </div>
 </nav>
@@ -38,10 +38,10 @@
     <div class="hero-meta-row">
       <div class="hero-meta-dot"></div>
       <span class="hero-meta-label">Renderer</span>
-      <span class="hero-meta-val">Active</span>
+      <span class="hero-meta-val">Aktif</span>
     </div>
     <div class="hero-meta-row" style="margin-top:2px;">
-      <span class="hero-meta-label" style="margin-left:11px;">Algo</span>
+      <span class="hero-meta-label" style="margin-left:11px;">Algoritma</span>
       <span class="hero-meta-val">Bresenham</span>
     </div>
   </div>
@@ -108,7 +108,7 @@
         <span class="sb-title">Kontrol</span>
       </div>
       <div class="ctrl-row">
-        <span class="ctrl-label">Speed</span>
+        <span class="ctrl-label">Kecepatan</span>
         <input type="range" id="speedRange" min="0" max="50" value="0" step="1" />
         <span class="speed-val" id="speedVal">0 ms</span>
       </div>
@@ -144,7 +144,7 @@
       <div class="zoom-controls">
         <button class="zoom-btn" id="zoomIn" title="Perbesar">+</button>
         <button class="zoom-btn" id="zoomOut" title="Perkecil">−</button>
-        <button class="zoom-btn" id="zoomReset" title="Reset">↺</button>
+        <button class="zoom-btn" id="zoomReset" title="Atur Ulang">↺</button>
         <span class="zoom-level" id="zoomLevel">100%</span>
       </div>
     </div>
@@ -153,7 +153,7 @@
     <div class="bottombar">
       <div class="bb-resize-handle"></div>
       <div class="bb-tabs">
-        <div class="bb-tab active" data-tab="log">Output Log</div>
+        <div class="bb-tab active" data-tab="log">Log Keluaran</div>
         <div class="bb-tab" data-tab="data">Tabel Data</div>
       </div>
       <div id="stepLog"></div>
@@ -179,12 +179,12 @@
   } else {
     body.classList.add('light');
     icon.textContent  = '☀️';
-    label.textContent = 'Light';
+    label.textContent = 'Terang';
   }
   btn.addEventListener('click', function() {
     var isLight = body.classList.toggle('light');
     icon.textContent  = isLight ? '☀️' : '🌙';
-    label.textContent = isLight ? 'Light' : 'Dark';
+    label.textContent = isLight ? 'Terang' : 'Gelap';
     localStorage.setItem('kurva-theme', isLight ? 'light' : 'dark');
     // Redraw grid supaya warna canvas ikut tema
     if (typeof drawGrid === 'function') drawGrid();

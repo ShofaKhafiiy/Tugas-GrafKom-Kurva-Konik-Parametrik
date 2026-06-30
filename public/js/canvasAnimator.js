@@ -85,6 +85,16 @@ function initCanvas() {
       redrawCanvas();
     }
   });
+
+  AnimatorState.canvas.addEventListener('click', function(e) {
+    var rect = AnimatorState.canvas.getBoundingClientRect();
+    var mx = (e.clientX - rect.left) * (AnimatorState.canvas.width / rect.width);
+    var my = (e.clientY - rect.top) * (AnimatorState.canvas.height / rect.height);
+    var nearest = findNearestPoint(mx, my, 10);
+    if (nearest && typeof highlightTableRow === 'function') {
+      highlightTableRow(nearest.index);
+    }
+  });
 }
 
 function mapCoordinate(x, y) {
@@ -106,13 +116,13 @@ function findNearestPoint(cx, cy, threshold) {
     var dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < bestDist) {
       bestDist = dist;
-      best = { point: pt, px: m.px, py: m.py };
+      best = { point: pt, px: m.px, py: m.py, index: i };
     }
   }
   return best;
 }
 
-// Deteksi apakah body punya class 'light'
+// Check if body has 'light' class
 function isLightMode() {
   return document.body.classList.contains('light');
 }

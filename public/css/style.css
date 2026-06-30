@@ -775,6 +775,10 @@ input[type='range'] {
   background: var(--accent-dim);
   color: var(--accent);
 }
+#dataTableContainer tbody tr.highlighted td {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+}
 #dataTableContainer::-webkit-scrollbar { width: 3px; }
 #dataTableContainer::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 99px; }
 

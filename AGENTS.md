@@ -83,7 +83,9 @@ Jangan merge sebelum US sebelumnya sudah masuk ke main.
 - Konstanta: `UPPER_SNAKE_CASE` jika perlu
 - String: petik tunggal `'...'` (kecuali template literal)
 - Titik koma: WAJIB `;` di akhir statement
-- Komentar: DILARANG menambahkan komentar penjelasan
+- Komentar: WAJIB untuk dokumentasi profesional (penjelasan fungsi, parameter, algoritma)
+  Gunakan Bahasa Inggris, ringkas, dan informatif. HAPUS komentar bekas AI agent
+  (seperti penanda perubahan, catatan TODO, atau referensi proses development).
 - console.log: HANYA untuk debugging, hapus sebelum commit
 - Indentasi: 2 spasi
 
@@ -154,6 +156,6 @@ Contoh:
 
 - ❌ Jangan mengubah file yang bukan tanggung jawab US Anda
 - ❌ Jangan menghapus kode dari US lain
-- ❌ Jangan menambah komentar penjelasan
+- ❌ Jangan menambah komentar bekas AI agent (penanda perubahan, TODO, referensi proses development)
 - ❌ Jangan mengubah nama/parameter/return type fungsi yang sudah ada
 - ❌ Jangan push ke `main` langsung (selalu lewat merge)
