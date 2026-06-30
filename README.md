@@ -5,13 +5,10 @@
 > Visualisasi interaktif pembangkitan kurva konik parametrik berbasis web.
 > Lingkaran, Elips, Parabola, dan Hiperbola dirender secara animatif step-by-step
 > menggunakan algoritma representasi parametrik dengan dukungan simetri, preset,
-> export data, dan analisis properti kurva.
+> dan analisis properti kurva.
 
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-blue?logo=vercel)](https://kurva-konik-parametrik.vercel.app)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/ShofaKhafiiy/Tugas-GrafKom-Kurva-Konik-Parametrik)
-![JavaScript](https://img.shields.io/badge/JavaScript-89.7%25-f7df1e?logo=javascript)
-![CSS](https://img.shields.io/badge/CSS-20.8%25-1572b6?logo=css3)
-![PWA](https://img.shields.io/badge/PWA-Ready-5a0fc8?logo=pwa)
 
 ---
 
@@ -29,9 +26,7 @@
   - [Parabola — Power-Law Distribution](#parabola--power-law-distribution)
   - [Hiperbola — Dua Cabang](#hiperbola--dua-cabang)
 - [API Server](#api-server)
-- [Testing](#testing)
 - [User Stories](#user-stories)
-- [Kontributor](#kontributor)
 - [Lisensi](#lisensi)
 
 ---
@@ -65,42 +60,31 @@ parametrik.
 | **Lingkaran** | Parametrik `x = xc + r·cos(t)`, `y = yc + r·sin(t)` — 8-way symmetry |
 | **Elips** | Parametrik `x = xc + a·cos(t)`, `y = yc + b·sin(t)` — 4-way symmetry |
 | **Parabola** | 4 orientasi (kanan, kiri, atas, bawah) — power-law distribution |
-| **Hiperbola** | Horizontal & vertikal — menghasilkan 2 cabang dengan label |
+| **Hiperbola** | Horizontal, vertikal, cabang kiri — menghasilkan 2 cabang dengan label |
 
 ### Interaktivitas
-- **Pilih kurva** melalui kartu pemilihan (Lingkaran, Elips, Parabola, Hiperbola)
+- **Pilih kurva** melalui dropdown (Lingkaran, Elips, Parabola, Hiperbola)
 - **Parameter masukan** dinamis sesuai tipe kurva (pusat, jari-jari, sumbu, delta, rentang t)
+- **Slider** untuk parameter terbatas (r, a, b, delta) — nilai dapat diubah via slider atau input number
 - **Preset cepat** untuk mencoba berbagai konfigurasi dengan satu klik
-- **Animasi render** titik-per-titik dengan delay yang bisa diatur
-- **Pause / Resume** animasi kapan saja
-- **Undo** ke kurva sebelumnya (stack hingga 20 entri)
-- **Bandingkan 2 kurva** — simpan kurva saat ini sebagai referensi, lalu render yang baru
-- **Reset parameter** ke nilai default
+- **Animasi render** titik-per-titik dengan delay yang bisa diatur (0–50ms)
+- **Toggle garis** — tampilkan/sembunyikan garis penghubung antar titik
 
 ### Visualisasi
-- **Grid koordinat** dengan sumbu X dan Y
-- **Titik fokus** — menampilkan pusat/fokus pada setiap jenis kurva
-- **Garis asimtot** — untuk hiperbola (garis putus-putus merah)
-- **Garis directrix** — untuk parabola (garis putus-putus kuning)
-- **Tooltip koordinat** — hover pada canvas menampilkan X, Y real-time
-- **Info bar** — menampilkan koordinat X, Y, parameter t, status, dan progres
+- **Grid koordinat** adaptif dengan sumbu X dan Y, tick marks, dan label
+- **Zoom & Pan** — scroll untuk zoom (sensitifitas adaptif), drag untuk geser canvas
+- **Tombol zoom** — perbesar, perkecil, dan atur ulang tampilan
+- **Hover tooltip** — menampilkan koordinat (X, Y) real-time saat kursor di atas titik
+- **Klik titik** — sorot baris tabel data yang sesuai dan zoom ke titik tersebut
+- **Info bar** — menampilkan koordinat X, Y, parameter t, status, dan progres rendering
 - **Panel analisis** — menampilkan formula parametrik dan properti kurva (eksentrisitas, luas, dll)
-- **Riwayat parameter** — daftar kurva yang pernah diproses; klik untuk memuat ulang
-
-### Export & Data
-| Fitur | Format |
-|-------|--------|
-| Export canvas sebagai gambar | PNG |
-| Download koordinat kurva | CSV |
-| Download data kurva (struktur JSON) | JSON |
-| Save ke server | POST `/api/save-curve` |
+- **Log keluaran** — mencatat setiap langkah proses rendering
+- **Tabel data** — daftar koordinat tiap titik; klik baris untuk zoom ke titik tersebut
 
 ### Tampilan & Pengalaman
-- **Dark mode & Light mode** — toggle tema
-- **Layar penuh** — mode fullscreen canvas
-- **Responsive** — mendukung desktop, tablet, dan smartphone
-- **Shortcut keyboard** — Enter, R, Z, Spasi, F, D, T
-- **PWA support** — dapat diinstal sebagai aplikasi desktop/mobile dan berjalan offline
+- **Dark mode & Light mode** — toggle tema dengan ikon
+- **Responsive** — mendukung desktop dan tablet
+- **Modal notifikasi** — menggantikan `alert()` dengan popup kustom (blur background)
 
 ---
 
@@ -113,8 +97,6 @@ parametrik.
 | **Canvas API** | Rendering kurva, grid, dan elemen visual |
 | **Node.js + Express** | Server backend — menyimpan riwayat kurva |
 | **Vercel** | Deployment production (static output di folder `public/`) |
-| **PWA (Manifest + Service Worker)** | Installability dan offline caching |
-| **GitHub CLI (`gh`)** | Manajemen repository dan kolaborasi tim |
 
 ---
 
@@ -124,19 +106,14 @@ parametrik.
 /
 ├── public/                      # Root direktori untuk deployment
 │   ├── index.html               # Halaman utama aplikasi
-│   ├── manifest.json            # Manifest PWA
-│   ├── sw.js                    # Service Worker untuk cache offline
 │   ├── css/
 │   │   └── style.css            # Styling lengkap (dark/light, responsive)
 │   ├── js/
 │   │   ├── geometryCalc.js      # Kalkulasi parametrik 4 kurva konik
-│   │   ├── canvasAnimator.js    # Render canvas, animasi, grid, ekspor
-│   │   ├── ui.js                # Interaksi UI, form, validasi, analisis
-│   │   └── test.js              # Validasi 5 feedback dosen (browser console)
-│   └── CATATAN_PERUBAHAN.md     # Dokumentasi fitur responsive mobile
+│   │   ├── canvasAnimator.js    # Render canvas, animasi, grid, interaksi
+│   │   └── ui.js                # Interaksi UI, form, validasi, analisis
 ├── server.js                    # Express server (POST /api/save-curve)
 ├── vercel.json                  # Konfigurasi deployment Vercel
-├── .vercelignore                # File yang diabaikan Vercel
 ├── AGENTS.md                    # Panduan AI untuk kolaborasi tim
 └── README.md                    # Dokumentasi ini
 ```
@@ -177,11 +154,7 @@ node server.js
 
 ### Deployment ke Vercel
 
-```bash
-./deploy.sh
-```
-
-Atau hubungkan repository GitHub ke Vercel secara otomatis.
+Hubungkan repository GitHub ke Vercel secara otomatis.
 Konfigurasi deployment sudah ada di `vercel.json`:
 
 ```json
@@ -198,7 +171,7 @@ Akses: [https://kurva-konik-parametrik.vercel.app](https://kurva-konik-parametri
 ## Penggunaan
 
 ### 1. Memilih Kurva
-Klik kartu kurva di panel kiri: **Lingkaran**, **Elips**, **Parabola**, atau **Hiperbola**.
+Pilih kurva dari dropdown di panel kiri: **Lingkaran**, **Elips**, **Parabola**, atau **Hiperbola**.
 Parameter masukan akan berubah sesuai tipe kurva yang dipilih.
 
 ### 2. Mengatur Parameter
@@ -211,21 +184,21 @@ Isi parameter di form yang tersedia:
 - **t₀, t₁** — rentang parameter t (dalam radian)
 - **Orientasi** — arah bukaan (parabola/hiperbola)
 
+Parameter dengan batas nilai (r, a, b, delta) dapat diatur melalui slider atau diketik langsung.
+
 Gunakan **Preset Cepat** untuk mencoba konfigurasi populer.
 
 ### 3. Proses & Animasi
-Klik tombol **Proses** (atau tekan `Enter`) untuk memulai animasi rendering.
-Gunakan **Pause/Resume** (atau tekan `Spasi`) untuk mengontrol animasi.
-Progress bar dan koordinat live akan diperbarui setiap titik.
+Klik tombol **Render Kurva** untuk memulai animasi rendering.
+Kecepatan animasi dapat diatur melalui slider **Kecepatan** (0ms = tanpa delay).
+Info bar akan menampilkan koordinat live dan progres setiap titik.
 
-### 4. Fitur Lanjutan
-- **Bandingkan**: centang "Bandingkan" untuk menyimpan kurva saat ini sebagai referensi
-- **Undo**: klik tombol ↩ atau tekan `Z` untuk kembali ke kurva sebelumnya
-- **Export PNG**: klik tombol kamera atau tekan `D`
-- **Export CSV**: klik tombol dokumen
-- **Fullscreen**: klik tombol ⛶ atau tekan `F`
-- **Toggle tema**: klik tombol ⌖ atau tekan `T`
-- **Toggle visual**: centang/centang checkbox untuk titik fokus, asimtot, directrix
+### 4. Navigasi Canvas
+- **Zoom**: scroll touchpad/mouse atau tombol `+` / `−` di pojok kanan atas canvas
+- **Pan**: klik dan drag canvas
+- **Reset tampilan**: klik tombol `↺`
+- **Hover**: arahkan kursor ke titik untuk melihat koordinat
+- **Klik**: klik titik untuk zoom dan sorot baris tabel data
 
 ---
 
@@ -318,30 +291,6 @@ Menyimpan data kurva ke server (array in-memory).
 
 ---
 
-## Testing
-
-Tersedia file `public/js/test.js` untuk memvalidasi **5 feedback dosen**:
-
-1. **DDA Line Drawing** — memastikan fungsi `drawLineBresenham` tersedia
-2. **8-Way Symmetry** — lingkaran menggunakan mirror 8 oktan, titik (r,0), (0,r), (-r,0), (0,-r) ada
-3. **Radian** — fungsi `degToRad()` bekerja, label parameter menyertakan "(rad)"
-4. **Parabola Density** — power-law aktif, step t di ujung > step di tengah
-5. **Hiperbola Dua Cabang** — titik memiliki properti branch, cabang kanan & kiri (atau atas & bawah) ada
-
-### Cara menjalankan test
-
-```bash
-# Jalankan server
-node server.js
-
-# Buka http://localhost:3000 di browser
-# Buka console (F12) — test otomatis dijalankan oleh test.js
-```
-
-Atau buka console di halaman deploy: [https://kurva-konik-parametrik.vercel.app](https://kurva-konik-parametrik.vercel.app)
-
----
-
 ## User Stories
 
 Project ini dikerjakan oleh 4 anggota tim dengan pembagian tugas sebagai berikut:
@@ -353,24 +302,7 @@ Project ini dikerjakan oleh 4 anggota tim dengan pembagian tugas sebagai berikut
 | **US 2.1** | `US-2.1-visualisasi-proses` | Visualisasi Proses Render — canvas, grid, animasi titik-per-titik | Anggota 3 |
 | **US 2.2** | `US-2.2-bentuk-akhir` | Visualisasi Bentuk Akhir & Live Tracking — info bar, analysis panel, server | Anggota 4 |
 
-Branch tambahan yang telah di-merge:
-- `feature-responsive-mobile` — 18 fitur upgrade termasuk PWA, dark/light mode, export, dll
-- `fix-perbaikan-matematis-Budi` — perbaikan kalkulasi matematika
-
 Urutan merge wajib: `main → US-1.1 → US-1.2 → US-2.1 → US-2.2 → main`
-
----
-
-## Kontributor
-
-| Avatar | Nama | GitHub | Kontribusi |
-|--------|------|--------|------------|
-| <img src="https://avatars.githubusercontent.com/u/118283737?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **MBOEDIK** | [@MBOEDIK](https://github.com/MBOEDIK) | 9 commits |
-| <img src="https://avatars.githubusercontent.com/u/142008212?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **ShofaKhafiiy** | [@ShofaKhafiiy](https://github.com/ShofaKhafiiy) | 7 commits |
-| <img src="https://avatars.githubusercontent.com/u/140729456?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **Irwand13** | [@Irwand13](https://github.com/Irwand13) | 4 commits |
-| <img src="https://avatars.githubusercontent.com/u/181911741?v=4&s=48" width="48" height="48" style="border-radius:50%"> | **iiooo920** | [@iiooo920](https://github.com/iiooo920) | 1 commit |
-
-*Data kontributor diambil langsung dari GitHub API melalui `gh CLI`.*
 
 ---
 
