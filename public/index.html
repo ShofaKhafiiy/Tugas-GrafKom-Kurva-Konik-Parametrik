@@ -175,7 +175,8 @@
   var label = document.getElementById('themeLabel');
   var body  = document.body;
   var saved = localStorage.getItem('kurva-theme');
-  if (saved === 'light') {
+  if (saved === 'dark') {
+  } else {
     body.classList.add('light');
     icon.textContent  = '☀️';
     label.textContent = 'Light';
