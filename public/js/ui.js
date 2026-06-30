@@ -1,13 +1,8 @@
-// US 1.1 — DROPDOWN + FORM DINAMIS
-// US 1.2 — VALIDASI + PROSES GAMBAR
-
-// US 2.2 — PANEL ANALISIS
 // ============================================================
-// Logika antarmuka: parameter, preset, validasi, analisis
-// Depends on: geometryCalc.js, canvasAnimator.js
+// UI logic: parameter forms, presets, validation, analysis
 // ============================================================
 
-var TWO_PI = 2 * Math.PI;
+var twoPi = 2 * Math.PI;
 var lastCurvePoints = null;
 var lastCurveType = null;
 
@@ -22,7 +17,7 @@ function getParamDefs(curveType) {
       { id: 'r',     label: 'Radius  (r)',     val: 100,  type: 'number', step: 1 },
       { id: 'delta', label: 'Delta  (Δθ rad)', val: 0.05, type: 'number', step: 0.01 },
       { id: 'tMin',  label: 'θ min (rad)',     val: 0,    type: 'number', step: 0.1 },
-      { id: 'tMax',  label: 'θ max (rad)',     val: TWO_PI, type: 'number', step: 0.1 }
+      { id: 'tMax',  label: 'θ max (rad)',     val: twoPi, type: 'number', step: 0.1 }
     ];
   }
 
@@ -34,7 +29,7 @@ function getParamDefs(curveType) {
       { id: 'b',     label: 'Semi-b  (vertikal)',  val: 80,  type: 'number', step: 1 },
       { id: 'delta', label: 'Delta  (Δθ rad)',   val: 0.05, type: 'number', step: 0.01 },
       { id: 'tMin',  label: 'θ min (rad)',       val: 0,    type: 'number', step: 0.1 },
-      { id: 'tMax',  label: 'θ max (rad)',       val: TWO_PI, type: 'number', step: 0.1 }
+      { id: 'tMax',  label: 'θ max (rad)',       val: twoPi, type: 'number', step: 0.1 }
     ];
   }
 
@@ -87,23 +82,23 @@ function getParamDefs(curveType) {
 function getPresets(curveType) {
   if (curveType === 'circle') {
     return [
-      { name: 'Standar',    desc: 'r = 100',          params: { xc:0,   yc:0,  r:100, delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Besar',      desc: 'r = 200',          params: { xc:0,   yc:0,  r:200, delta:0.04, tMin:0, tMax:TWO_PI } },
-      { name: 'Geser Kiri', desc: 'xc = -100',        params: { xc:-100,yc:0,  r:80,  delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Geser Atas', desc: 'yc = 80',          params: { xc:0,   yc:80, r:70,  delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Detail',     desc: 'r=40, Δ=0.02',    params: { xc:0,   yc:0,  r:40,  delta:0.02, tMin:0, tMax:TWO_PI } },
-      { name: 'Pojok',      desc: 'r=70, pojok',      params: { xc:120, yc:100,r:70,  delta:0.05, tMin:0, tMax:TWO_PI } }
+      { name: 'Standar',    desc: 'r = 100',          params: { xc:0,   yc:0,  r:100, delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Besar',      desc: 'r = 200',          params: { xc:0,   yc:0,  r:200, delta:0.04, tMin:0, tMax:twoPi } },
+      { name: 'Geser Kiri', desc: 'xc = -100',        params: { xc:-100,yc:0,  r:80,  delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Geser Atas', desc: 'yc = 80',          params: { xc:0,   yc:80, r:70,  delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Detail',     desc: 'r=40, Δ=0.02',    params: { xc:0,   yc:0,  r:40,  delta:0.02, tMin:0, tMax:twoPi } },
+      { name: 'Pojok',      desc: 'r=70, pojok',      params: { xc:120, yc:100,r:70,  delta:0.05, tMin:0, tMax:twoPi } }
     ];
   }
 
   if (curveType === 'ellipse') {
     return [
-      { name: 'Standar',       desc: 'a=150, b=80',  params: { xc:0,  yc:0, a:150, b:80,  delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Vertikal',      desc: 'a=60, b=140',  params: { xc:0,  yc:0, a:60,  b:140, delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Lonjong',       desc: 'a=220, b=40',  params: { xc:0,  yc:0, a:220, b:40,  delta:0.04, tMin:0, tMax:TWO_PI } },
-      { name: 'Hampir Bulat',  desc: 'a=110, b=95',  params: { xc:0,  yc:0, a:110, b:95,  delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Geser Kanan',   desc: 'xc=100',       params: { xc:100,yc:0, a:100, b:60,  delta:0.05, tMin:0, tMax:TWO_PI } },
-      { name: 'Pipih',         desc: 'a=200, b=20',  params: { xc:0,  yc:0, a:200, b:20,  delta:0.04, tMin:0, tMax:TWO_PI } }
+      { name: 'Standar',       desc: 'a=150, b=80',  params: { xc:0,  yc:0, a:150, b:80,  delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Vertikal',      desc: 'a=60, b=140',  params: { xc:0,  yc:0, a:60,  b:140, delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Lonjong',       desc: 'a=220, b=40',  params: { xc:0,  yc:0, a:220, b:40,  delta:0.04, tMin:0, tMax:twoPi } },
+      { name: 'Hampir Bulat',  desc: 'a=110, b=95',  params: { xc:0,  yc:0, a:110, b:95,  delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Geser Kanan',   desc: 'xc=100',       params: { xc:100,yc:0, a:100, b:60,  delta:0.05, tMin:0, tMax:twoPi } },
+      { name: 'Pipih',         desc: 'a=200, b=20',  params: { xc:0,  yc:0, a:200, b:20,  delta:0.04, tMin:0, tMax:twoPi } }
     ];
   }
 
@@ -383,7 +378,6 @@ function processCurve() {
 
   showAnalysis(curveType, vals);
 
-  // Log 4 langkah algoritma dari PPT
   var log = document.getElementById('stepLog');
   log.innerHTML = '';
   addLog('[ 1. INISIALISASI ] Kurva: ' + curveType.toUpperCase() +
@@ -515,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Resize bottombar via drag handle
   var bbResizeHandle = document.querySelector('.bb-resize-handle');
   var bottombar = document.querySelector('.bottombar');
-  var MIN_BB_HEIGHT = 80;
+  var minBbHeight = 80;
   var isResizing = false;
 
   bbResizeHandle.addEventListener('mousedown', function(e) {
@@ -527,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!isResizing) return;
     var bbRect = bottombar.parentElement.getBoundingClientRect();
     var newHeight = bbRect.bottom - e.clientY;
-    if (newHeight < MIN_BB_HEIGHT) newHeight = MIN_BB_HEIGHT;
+    if (newHeight < minBbHeight) newHeight = minBbHeight;
     bottombar.style.height = newHeight + 'px';
     resizeCanvas();
   });

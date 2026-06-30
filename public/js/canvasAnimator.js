@@ -112,7 +112,7 @@ function findNearestPoint(cx, cy, threshold) {
   return best;
 }
 
-// Deteksi apakah body punya class 'light'
+// Check if body has 'light' class
 function isLightMode() {
   return document.body.classList.contains('light');
 }
