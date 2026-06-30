@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setZoom(AnimatorState.scale / 1.3);
   };
   document.getElementById('zoomReset').onclick = function() {
-    setZoom(1.0);
+    resetView();
   };
 
   // Live analisis saat parameter diubah

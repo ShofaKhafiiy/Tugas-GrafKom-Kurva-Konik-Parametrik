@@ -10,8 +10,15 @@ var AnimatorState = {
   animId: null,
   showLines: true,
   scale: 1.0,
+  offsetX: 0,
+  offsetY: 0,
   lastPoints: null,
-  lastSpeedMs: 0
+  lastSpeedMs: 0,
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  offsetStartX: 0,
+  offsetStartY: 0
 };
 
 function initCanvas() {
@@ -19,17 +26,48 @@ function initCanvas() {
   AnimatorState.ctx    = AnimatorState.canvas.getContext('2d');
   AnimatorState.W      = AnimatorState.canvas.width;
   AnimatorState.H      = AnimatorState.canvas.height;
+  AnimatorState.canvas.style.cursor = 'grab';
+
   AnimatorState.canvas.addEventListener('wheel', function(e) {
     e.preventDefault();
     setZoom(AnimatorState.scale * (e.deltaY > 0 ? 0.9 : 1.1));
   }, { passive: false });
+
+  AnimatorState.canvas.addEventListener('mousedown', function(e) {
+    AnimatorState.isDragging = true;
+    AnimatorState.dragStartX = e.clientX;
+    AnimatorState.dragStartY = e.clientY;
+    AnimatorState.offsetStartX = AnimatorState.offsetX;
+    AnimatorState.offsetStartY = AnimatorState.offsetY;
+    AnimatorState.canvas.style.cursor = 'grabbing';
+    if (AnimatorState.animId) {
+      cancelAnimationFrame(AnimatorState.animId);
+      AnimatorState.animId = null;
+      document.getElementById('processBtn').disabled = false;
+    }
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!AnimatorState.isDragging) return;
+    var dx = e.clientX - AnimatorState.dragStartX;
+    var dy = e.clientY - AnimatorState.dragStartY;
+    AnimatorState.offsetX = AnimatorState.offsetStartX + dx;
+    AnimatorState.offsetY = AnimatorState.offsetStartY + dy;
+    redrawCanvas();
+  });
+
+  document.addEventListener('mouseup', function(e) {
+    if (!AnimatorState.isDragging) return;
+    AnimatorState.isDragging = false;
+    AnimatorState.canvas.style.cursor = 'grab';
+  });
 }
 
 function mapCoordinate(x, y) {
   var cx = AnimatorState.W / 2;
   var cy = AnimatorState.H / 2;
   var s  = AnimatorState.scale;
-  return { px: cx + x * s, py: cy - y * s };
+  return { px: cx + x * s + AnimatorState.offsetX, py: cy - y * s + AnimatorState.offsetY };
 }
 
 // Deteksi apakah body punya class 'light'
@@ -53,6 +91,8 @@ function drawGrid() {
   var H     = AnimatorState.H;
   var cx    = W / 2;
   var cy    = H / 2;
+  var ox    = AnimatorState.offsetX;
+  var oy    = AnimatorState.offsetY;
   var s     = AnimatorState.scale;
   var light = isLightMode();
 
@@ -63,11 +103,11 @@ function drawGrid() {
   var labelStep = getNiceStep(80 / s);
   var gridStep  = Math.max(labelStep / 5, labelStep / Math.ceil(labelStep * s / 5));
 
-  // World boundaries visible on canvas
-  var minWX = -cx / s;
-  var maxWX = (W - cx) / s;
-  var minWY = -(H - cy) / s;
-  var maxWY = cy / s;
+  // World boundaries visible on canvas (with pan offset)
+  var minWX = (-cx - ox) / s;
+  var maxWX = (W - cx - ox) / s;
+  var minWY = (cy + oy - H) / s;
+  var maxWY = (cy + oy) / s;
 
   // Decimal places for labels
   var decimals = 0;
@@ -81,20 +121,22 @@ function drawGrid() {
 
   var startGX = Math.ceil(minWX / gridStep) * gridStep;
   for (var wx = startGX; wx <= maxWX; wx += gridStep) {
-    var px = cx + wx * s;
+    var px = cx + wx * s + ox;
     ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
   }
   var startGY = Math.ceil(minWY / gridStep) * gridStep;
   for (var wy = startGY; wy <= maxWY; wy += gridStep) {
-    var py = cy - wy * s;
+    var py = cy - wy * s + oy;
     ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke();
   }
 
   // ── Sumbu X Y ──
   ctx.strokeStyle = light ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.18)';
   ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+  var axisX = cy + oy;
+  var axisY = cx + ox;
+  ctx.beginPath(); ctx.moveTo(0, axisX); ctx.lineTo(W, axisX); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(axisY, 0); ctx.lineTo(axisY, H); ctx.stroke();
 
   // ── Tick marks + label ──
   ctx.font = '9px JetBrains Mono, monospace';
@@ -105,12 +147,12 @@ function drawGrid() {
   var startLX = Math.ceil(minWX / labelStep) * labelStep;
   for (var wx = startLX; wx <= maxWX; wx += labelStep) {
     if (Math.abs(wx) < 1e-9) continue;
-    var px = cx + wx * s;
+    var px = cx + wx * s + ox;
     if (px < 0 || px > W) continue;
     ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(px, cy - 3); ctx.lineTo(px, cy + 3); ctx.stroke();
-    ctx.fillText(wx.toFixed(decimals), px, cy + 13);
+    ctx.beginPath(); ctx.moveTo(px, axisX - 3); ctx.lineTo(px, axisX + 3); ctx.stroke();
+    ctx.fillText(wx.toFixed(decimals), px, axisX + 13);
   }
 
   // Y-axis
@@ -118,21 +160,58 @@ function drawGrid() {
   var startLY = Math.ceil(minWY / labelStep) * labelStep;
   for (var wy = startLY; wy <= maxWY; wy += labelStep) {
     if (Math.abs(wy) < 1e-9) continue;
-    var py = cy - wy * s;
+    var py = cy - wy * s + oy;
     if (py < 0 || py > H) continue;
     ctx.strokeStyle = light ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(cx - 3, py); ctx.lineTo(cx + 3, py); ctx.stroke();
-    ctx.fillText(wy.toFixed(decimals), cx - 5, py + 3);
+    ctx.beginPath(); ctx.moveTo(axisY - 3, py); ctx.lineTo(axisY + 3, py); ctx.stroke();
+    ctx.fillText(wy.toFixed(decimals), axisY - 5, py + 3);
   }
 
   // Label sumbu + origin
   ctx.fillStyle = light ? 'rgba(37,99,235,0.6)' : 'rgba(96,130,200,0.5)';
   ctx.font = '10px JetBrains Mono, monospace';
   ctx.textAlign = 'left';
-  ctx.fillText('X', W - 13, cy - 6);
-  ctx.fillText('Y', cx + 6, 12);
-  ctx.fillText('0', cx + 4, cy + 12);
+  ctx.fillText('X', W - 13, axisX - 6);
+  ctx.fillText('Y', axisY + 6, 12);
+  ctx.fillText('0', axisY + 4, axisX + 12);
+}
+
+function redrawCanvas() {
+  drawGrid();
+  if (!AnimatorState.lastPoints || AnimatorState.lastPoints.length === 0) return;
+  var pts = AnimatorState.lastPoints;
+  var ctx = AnimatorState.ctx;
+  var W = AnimatorState.W;
+  var H = AnimatorState.H;
+
+  var lineGrad = ctx.createLinearGradient(0, 0, W, H);
+  lineGrad.addColorStop(0, '#00d4ff');
+  lineGrad.addColorStop(0.5, '#acb6b8');
+  lineGrad.addColorStop(1, '#035c8b');
+
+  var dotColor = isLightMode() ? '#1e293b' : '#ffffff';
+  var prevPx = null, prevPy = null;
+
+  for (var i = 0; i < pts.length; i++) {
+    var mapped = mapCoordinate(pts[i].x, pts[i].y);
+    var px = mapped.px, py = mapped.py;
+
+    if (pts[i].newBranch) { prevPx = null; prevPy = null; }
+
+    if (prevPx !== null && AnimatorState.showLines) {
+      ctx.globalAlpha = 0.9;
+      drawLineBresenham(ctx, prevPx, prevPy, px, py, lineGrad, 1.5);
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.fillStyle = dotColor;
+    ctx.beginPath();
+    ctx.arc(px, py, 2.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    prevPx = px; prevPy = py;
+  }
 }
 
 function setZoom(newScale) {
@@ -144,6 +223,12 @@ function setZoom(newScale) {
   } else {
     drawGrid();
   }
+}
+
+function resetView() {
+  AnimatorState.offsetX = 0;
+  AnimatorState.offsetY = 0;
+  setZoom(1.0);
 }
 
 function drawLineBresenham(ctx, x0, y0, x1, y1, color, radius) {
