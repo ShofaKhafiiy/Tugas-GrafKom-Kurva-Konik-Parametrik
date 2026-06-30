@@ -8,6 +8,8 @@
 // ============================================================
 
 var TWO_PI = 2 * Math.PI;
+var lastCurvePoints = null;
+var lastCurveType = null;
 
 // ------------------------------------------------------------
 // getParamDefs — definisi field input per kurva
@@ -412,6 +414,10 @@ function processCurve() {
     }
   }
 
+  lastCurveType = curveType;
+  lastCurvePoints = points;
+  renderDataTable(points, curveType);
+
   addLog('[ TITIK ] ' + points.length + ' titik dihitung. Memulai animasi...');
   document.getElementById('processBtn').disabled = true;
 
@@ -419,6 +425,38 @@ function processCurve() {
   animateCurve(points, speedMs, function(elapsed, total) {
     addLog('[ SELESAI ] ' + total + ' titik dirender dalam ' + elapsed + ' detik.');
   });
+}
+
+// ------------------------------------------------------------
+// renderDataTable — tampilkan tabel input-output di bottombar
+// ------------------------------------------------------------
+function renderDataTable(points, curveType) {
+  var con = document.getElementById('dataTableContainer');
+  if (!points || points.length === 0) {
+    con.innerHTML = '<div style="padding:8px 14px;color:var(--text-2);">Belum ada data. Render kurva terlebih dahulu.</div>';
+    return;
+  }
+
+  var paramLabel = (curveType === 'parabola') ? 't' : 'θ (rad)';
+  var html = '<table><thead><tr>';
+  html += '<th>No</th>';
+  html += '<th>' + paramLabel + '</th>';
+  html += '<th>X</th>';
+  html += '<th>Y</th>';
+  html += '</tr></thead><tbody>';
+
+  for (var i = 0; i < points.length; i++) {
+    var pt = points[i];
+    html += '<tr>';
+    html += '<td>' + (i + 1) + '</td>';
+    html += '<td>' + pt.t.toFixed(4) + '</td>';
+    html += '<td>' + pt.x.toFixed(4) + '</td>';
+    html += '<td>' + pt.y.toFixed(4) + '</td>';
+    html += '</tr>';
+  }
+
+  html += '</tbody></table>';
+  con.innerHTML = html;
 }
 
 // ------------------------------------------------------------
@@ -445,6 +483,48 @@ document.addEventListener('DOMContentLoaded', function() {
   // Dropdown kurva berubah
   curveSelect.addEventListener('change', function() {
     renderParamsAndPresets(this.value);
+  });
+
+  // Tab switching (bottombar)
+  var tabs = document.querySelectorAll('.bb-tab');
+  for (var ti = 0; ti < tabs.length; ti++) {
+    (function(tab) {
+      tab.addEventListener('click', function() {
+        var active = document.querySelector('.bb-tab.active');
+        if (active) active.classList.remove('active');
+        tab.classList.add('active');
+        var target = tab.getAttribute('data-tab');
+        document.getElementById('stepLog').style.display = (target === 'log') ? '' : 'none';
+        document.getElementById('dataTableContainer').style.display = (target === 'data') ? '' : 'none';
+        if (target === 'data' && lastCurvePoints) {
+          renderDataTable(lastCurvePoints, lastCurveType);
+        }
+      });
+    })(tabs[ti]);
+  }
+
+  // Resize bottombar via drag handle
+  var bbResizeHandle = document.querySelector('.bb-resize-handle');
+  var bottombar = document.querySelector('.bottombar');
+  var MIN_BB_HEIGHT = 80;
+  var isResizing = false;
+
+  bbResizeHandle.addEventListener('mousedown', function(e) {
+    isResizing = true;
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isResizing) return;
+    var bbRect = bottombar.parentElement.getBoundingClientRect();
+    var newHeight = bbRect.bottom - e.clientY;
+    if (newHeight < MIN_BB_HEIGHT) newHeight = MIN_BB_HEIGHT;
+    bottombar.style.height = newHeight + 'px';
+    resizeCanvas();
+  });
+
+  document.addEventListener('mouseup', function() {
+    isResizing = false;
   });
 
   // Tombol proses

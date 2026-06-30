@@ -219,7 +219,7 @@ function setZoom(newScale) {
   var el = document.getElementById('zoomLevel');
   if (el) el.textContent = Math.round(AnimatorState.scale * 100) + '%';
   if (AnimatorState.lastPoints && AnimatorState.lastPoints.length > 0) {
-    animateCurve(AnimatorState.lastPoints, AnimatorState.lastSpeedMs);
+    redrawCanvas();
   } else {
     drawGrid();
   }
