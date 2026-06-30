@@ -14,13 +14,21 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Deploy to Vercel
+      - name: Override git author & deploy
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          GIT_AUTHOR_NAME: SHOFA
+          GIT_AUTHOR_EMAIL: shofakhafidin@gmail.com
+          GIT_COMMITTER_NAME: SHOFA
+          GIT_COMMITTER_EMAIL: shofakhafidin@gmail.com
         run: |
+          git config user.name "SHOFA"
+          git config user.email "shofakhafidin@gmail.com"
           vercel deploy \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --prod \
             --yes \
-            --no-wait
+            --no-wait \
+            --meta githubCommitAuthorName="SHOFA" \
+            --meta githubCommitAuthorEmail="shofakhafidin@gmail.com"
