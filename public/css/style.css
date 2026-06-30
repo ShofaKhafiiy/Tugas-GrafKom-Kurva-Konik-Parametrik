@@ -454,6 +454,57 @@ input[type='number']:focus, select:focus { border-color: var(--border-focus); }
 /* nilai panjang seperti 6.28318... tetap muat */
 input[type='number'] { font-size: 0.72rem; }
 
+/* ── Parameter slider row ── */
+.param-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.param-slider-row input[type='number'] {
+  width: 70px;
+  flex-shrink: 0;
+}
+.param-slider {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+  height: 4px;
+  background: transparent;
+}
+.param-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+}
+.param-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-top: -5px;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.param-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+.param-slider::-moz-range-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  border: none;
+}
+.param-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
 /* ── Controls ── */
 .ctrl-row {
   display: flex;
@@ -884,3 +935,78 @@ body.light #stepLog .log-line  { color: #64748b; }
 body.light #dataTableContainer td { color: #1e293b; }
 body.light #dataTableContainer th { color: #475569; background: #f8fafc; }
 body.light #dataTableContainer tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+
+/* ════════════════════════════════════════════════
+   MODAL POPUP
+   ════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 32px 22px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.92);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.open .modal-box {
+  transform: scale(1);
+}
+
+.modal-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.modal-msg {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 18px;
+  white-space: pre-wrap;
+}
+
+.modal-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 8px 28px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.modal-btn:hover {
+  background: #2563eb;
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.modal-btn:active {
+  transform: scale(0.97);
+}
