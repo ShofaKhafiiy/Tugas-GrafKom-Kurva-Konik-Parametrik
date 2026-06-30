@@ -682,6 +682,7 @@ input[type='range'] {
   background: var(--panel);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
+  height: 200px;
   min-height: 80px;
   position: relative;
   display: flex;
@@ -769,6 +770,10 @@ input[type='range'] {
 }
 #dataTableContainer tr:nth-child(even) td {
   background: rgba(255,255,255,0.02);
+}
+#dataTableContainer tbody tr:hover td {
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 #dataTableContainer::-webkit-scrollbar { width: 3px; }
 #dataTableContainer::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 99px; }
