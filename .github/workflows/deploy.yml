@@ -22,4 +22,5 @@ jobs:
           vercel deploy \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --prod \
-            --yes
+            --yes \
+            --no-wait
