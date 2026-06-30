@@ -1,6 +1,9 @@
 {
   "version": 2,
-  "outputDirectory": "public",
-  "buildCommand": "",
-  "devCommand": ""
+  "builds": [
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ]
 }
