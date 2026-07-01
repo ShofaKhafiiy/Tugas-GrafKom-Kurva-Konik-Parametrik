@@ -480,9 +480,7 @@ function processCurve() {
   } else if (curveType === 'ellipse') {
     points = calculateEllipse(vals.xc, vals.yc, vals.a, vals.b, vals.delta, vals.tMin, vals.tMax);
   } else if (curveType === 'parabola') {
-    var cvs = document.getElementById('mainCanvas');
-    var maxExt = Math.min(cvs.width, cvs.height) / 2 * 0.85;
-    points = calculateParabola(vals.xc, vals.yc, vals.a, vals.delta, vals.tMin, vals.tMax, vals.orientation, maxExt);
+    points = calculateParabola(vals.xc, vals.yc, vals.a, vals.delta, vals.tMin, vals.tMax, vals.orientation);
   } else if (curveType === 'hyperbola') {
     points = calculateHyperbola(vals.xc, vals.yc, vals.a, vals.b, vals.delta, vals.tMin, vals.tMax, vals.orientation);
     var branchNames = [];
