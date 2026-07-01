@@ -126,8 +126,8 @@ function calculateEllipse(xc, yc, a, b, delta, tMin, tMax) {
 // (xp, yp) = titik puncak (vertex), a = parameter fokus
 // t ∈ [tMin, tMax], step akurat (step count) agar imbang
 // ------------------------------------------------------------
-function getBalancedParabolaRange(a, orientation, maxExtent) {
-  var m = maxExtent || 200;
+function getBalancedParabolaRange(a, orientation, maxExtent = 1000) {
+  var m = 1000; // batas maksimum untuk t² agar tidak terlalu besar
   if (orientation === 'right' || orientation === 'left') {
     var tFromX = Math.sqrt(m / a);
     var tFromY = m / (2 * a);
